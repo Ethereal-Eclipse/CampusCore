@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
         email: {
           label: "Email",
           type: "text",
-          placeholder: "25019cs247@glbitm.ac.in",
+          placeholder: "student@glbitm.ac.in",
         },
         role: { label: "Role", type: "text", placeholder: "student" },
       },
@@ -41,8 +41,8 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email) return null
 
         const email = credentials.email.trim().toLowerCase()
-        const name = credentials.name?.trim() || "Campus Student"
         const role = credentials.role === "admin" ? "admin" : "student"
+        const name = credentials.name?.trim() || (role === "admin" ? "Admin User" : "Student")
 
         if (process.env.MONGODB_URI) {
           try {
@@ -54,6 +54,9 @@ export const authOptions: NextAuthOptions = {
                 email,
                 role,
               })
+            } else if (dbUser.name !== name) {
+              dbUser.name = name
+              await dbUser.save()
             }
             return {
               id: dbUser._id.toString(),

@@ -8,7 +8,7 @@ export default async function ProfilePage() {
   const session = await getServerSession(authOptions)
 
   const name = session?.user?.name || "Student"
-  const email = session?.user?.email || "25019cs247@glbitm.ac.in"
+  const email = session?.user?.email || "student@glbitm.ac.in"
   const image = session?.user?.image
   const role = session?.user?.role || "student"
   const academicBatch = getAcademicBatch(email)

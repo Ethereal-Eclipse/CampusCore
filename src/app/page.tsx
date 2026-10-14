@@ -175,7 +175,7 @@ export default function LandingPage() {
               </div>
               <div className="p-[14px] grid gap-[10px] content-start min-w-0">
                 <h4 className="text-[15px] font-semibold text-[var(--color-navy)]">
-                  Good morning, Nimish 👋
+                  Hello, Student 👋
                 </h4>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-[6px]">
                   <div className="rounded-[9px] p-[8px] border border-[var(--color-line)] text-[var(--color-mut)] bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] before:content-[''] before:block before:w-[16px] before:h-[16px] before:rounded-[5px] before:bg-[var(--color-card-ref)] before:mb-[6px] before:shadow-[0_1px_4px_rgba(30,58,138,0.15)]">
