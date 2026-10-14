@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
         email: {
           label: "Email",
           type: "text",
-          placeholder: "student@glbitm.ac.in",
+          placeholder: "25019cs247@glbitm.ac.in",
         },
         role: { label: "Role", type: "text", placeholder: "student" },
       },

@@ -12,7 +12,7 @@ function LoginForm() {
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
 
   const [devName, setDevName] = useState("Naman Sharma")
-  const [devEmail, setDevEmail] = useState("naman@glbitm.ac.in")
+  const [devEmail, setDevEmail] = useState("25019cs247@glbitm.ac.in")
   const [devRole, setDevRole] = useState<"student" | "admin">("student")
   const [isLoading, setIsLoading] = useState(false)
   const [showDevPanel, setShowDevPanel] = useState(false)
@@ -37,7 +37,7 @@ function LoginForm() {
     setIsLoading(true)
     signIn("credentials", {
       name: role === "admin" ? "Admin User" : "Naman Sharma",
-      email: role === "admin" ? "admin@glbitm.ac.in" : "naman@glbitm.ac.in",
+      email: role === "admin" ? "admin@glbitm.ac.in" : "25019cs247@glbitm.ac.in",
       role,
       callbackUrl,
     })

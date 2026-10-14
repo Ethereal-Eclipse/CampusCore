@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { getAcademicBatch } from "@/lib/student"
 
 export const instant = false
 
@@ -7,9 +8,10 @@ export default async function ProfilePage() {
   const session = await getServerSession(authOptions)
 
   const name = session?.user?.name || "Student"
-  const email = session?.user?.email || "student@glbitm.ac.in"
+  const email = session?.user?.email || "25019cs247@glbitm.ac.in"
   const image = session?.user?.image
   const role = session?.user?.role || "student"
+  const academicBatch = getAcademicBatch(email)
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -52,6 +54,10 @@ export default async function ProfilePage() {
             Academic Stats
           </h3>
           <ul className="flex flex-col gap-[12px] text-[14px] text-[var(--color-ink)]">
+            <li className="flex justify-between pb-[12px] border-b border-[var(--color-line)]">
+              <span className="text-[var(--color-mut)]">Academic Batch</span>
+              <span className="font-semibold">{academicBatch}</span>
+            </li>
             <li className="flex justify-between pb-[12px] border-b border-[var(--color-line)]">
               <span className="text-[var(--color-mut)]">Current Semester</span>
               <span className="font-semibold">-</span>

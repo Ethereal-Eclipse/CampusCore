@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
   const dummyMasterTickets: TicketData[] = [
     {
       id: "#1044",
-      student: "Arjun Verma (2501921540102@glbitm.ac.in)",
+      student: "Arjun Verma (25019cs102@glbitm.ac.in)",
       title: "Wi-Fi Access Point offline in Computer Lab 3",
       category: "Infrastructure",
       age: "52h ago",
@@ -39,7 +39,7 @@ export default async function AdminDashboardPage() {
     },
     {
       id: "#1043",
-      student: "Priya Nair (2501921540311@glbitm.ac.in)",
+      student: "Priya Nair (25019it311@glbitm.ac.in)",
       title: "Digital library portal session timeout error",
       category: "IT Support",
       age: "6h ago",
@@ -48,7 +48,7 @@ export default async function AdminDashboardPage() {
     },
     {
       id: "#1042",
-      student: "Naman Sharma (2501921540247@glbitm.ac.in)",
+      student: "Naman Sharma (25019cs247@glbitm.ac.in)",
       title: "Water dispenser filter replacement in Block B",
       category: "Maintenance",
       age: "18h ago",
@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
     },
     {
       id: "#1039",
-      student: "Rohan Das (2501921540440@glbitm.ac.in)",
+      student: "Rohan Das (25019ec440@glbitm.ac.in)",
       title: "Air Conditioner thermostat broken in Audi 1",
       category: "Maintenance",
       age: "3d ago",
@@ -70,7 +70,7 @@ export default async function AdminDashboardPage() {
     {
       id: "vault-302",
       title: "Data Structures Hand-written Notes (Unit 4)",
-      uploadedBy: "rahul@glbitm.ac.in",
+      uploadedBy: "24019cs088@glbitm.ac.in",
       branch: "CSE",
       semester: "Sem 3",
       flagReason: "Incomplete pages and blurry scan quality",
@@ -79,7 +79,7 @@ export default async function AdminDashboardPage() {
     {
       id: "vault-119",
       title: "Operating Systems Old Syllabus PYQs 2018",
-      uploadedBy: "anjali@glbitm.ac.in",
+      uploadedBy: "24019it142@glbitm.ac.in",
       branch: "IT",
       semester: "Sem 4",
       flagReason: "Outdated 2018 syllabus curriculum",
@@ -91,7 +91,7 @@ export default async function AdminDashboardPage() {
     {
       id: "user-884",
       seller: "Karan Mehta",
-      email: "karan@glbitm.ac.in",
+      email: "23019me054@glbitm.ac.in",
       listing: "Engineering Graphics Drafter Tool Set",
       reports: 4,
       reason: "Repeatedly unresponsive to buyer meeting requests (Ghosting)",
