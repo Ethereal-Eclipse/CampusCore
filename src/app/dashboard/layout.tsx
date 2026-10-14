@@ -10,6 +10,7 @@ import {
   User,
   Set,
   Out,
+  Shield,
 } from "@/components/ui/Icons"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { LogoutButton } from "@/components/layout/LogoutButton"
@@ -88,6 +89,19 @@ export default async function DashboardLayout({
             <Bell className="w-[18px] h-[18px]" /> Notifications
             <span className="ml-auto bg-[#ef4444] text-white rounded-full min-w-[22px] text-center text-[11px] py-[2px]">
               3
+            </span>
+          </Link>
+
+          <small className="p-[14px_14px_6px] text-[var(--color-mut)] text-[12px] tracking-[0.5px] font-semibold">
+            MANAGEMENT
+          </small>
+          <Link
+            href="/dashboard/admin"
+            className="p-[10px_14px] rounded-[10px] text-[#7c3aed] text-[15px] font-semibold flex items-center gap-[12px] hover:bg-[#7c3aed]/10 transition-colors"
+          >
+            <Shield className="w-[18px] h-[18px]" /> Admin Console
+            <span className="ml-auto bg-[#7c3aed] text-white rounded-full px-[8px] text-center text-[10px] py-[2px]">
+              {session.user?.role === "admin" ? "ADMIN" : "PREVIEW"}
             </span>
           </Link>
 

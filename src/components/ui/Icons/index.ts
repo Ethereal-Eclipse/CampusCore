@@ -18,4 +18,9 @@ export {
   MapPin as Pin,
   Flame,
   Code,
+  Shield,
+  CheckCircle2 as CheckCircle,
+  AlertTriangle,
+  Upload,
+  Flag,
 } from "lucide-react"
