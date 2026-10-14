@@ -2,6 +2,52 @@ import Link from "next/link"
 import { Bld, Book, Cart, Cal, Search, Users } from "@/components/ui/Icons"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
+import { FeatureCard } from "@/components/home/FeatureCard"
+
+const features = [
+  {
+    icon: Bld,
+    iconBg: "bg-[#ffecee]",
+    iconColor: "text-[#ef4444]",
+    title: "Grievance & Service Desk",
+    description: "Report issues and track resolution in real-time.",
+  },
+  {
+    icon: Book,
+    iconBg: "bg-[#e8f1ff]",
+    iconColor: "text-[#3b82f6]",
+    title: "Academic Resource Vault",
+    description: "Access notes, PYQs, lab manuals and more.",
+  },
+  {
+    icon: Cart,
+    iconBg: "bg-[#e4f9ee]",
+    iconColor: "text-[#10b981]",
+    title: "Student Marketplace",
+    description: "Buy, sell and exchange items with verified students.",
+  },
+  {
+    icon: Cal,
+    iconBg: "bg-[#f5ebff]",
+    iconColor: "text-[#a855f7]",
+    title: "Campus Calendar",
+    description: "Stay updated with classes, exams, events and deadlines.",
+  },
+  {
+    icon: Search,
+    iconBg: "bg-[#fff6dc]",
+    iconColor: "text-[#f59e0b]",
+    title: "Lost & Found",
+    description: "Help campus belongings find their way home.",
+  },
+  {
+    icon: Users,
+    iconBg: "bg-[#e9ecff]",
+    iconColor: "text-[#6366f1]",
+    title: "Student Services",
+    description: "Access your profile, notifications, and more.",
+  },
+]
 
 export default function LandingPage() {
   return (
@@ -51,7 +97,7 @@ export default function LandingPage() {
             </h1>
             <p className="text-[var(--color-mut)] max-w-[440px] my-[24px] mb-[30px] text-[18px]">
               CampusCore is a unified campus portal that brings together student
-              services, resources, marketplace, events and more — all in one
+              services, resources, marketplace, events and more, all in one
               place.
             </p>
             <div className="flex flex-wrap gap-[14px] mb-[44px]">
@@ -221,77 +267,16 @@ export default function LandingPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px] text-left">
-            <article className="bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))] border border-[var(--color-line)] rounded-[18px] p-[32px] transition-all duration-250 hover:bg-[var(--color-card-ref)] hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[3px]">
-              <div className="w-[56px] h-[56px] rounded-[15px] grid place-items-center mb-[26px] bg-[#ffecee] text-[#ef4444]">
-                <Bld className="w-[28px] h-[28px]" />
-              </div>
-              <h3 className="text-[20px] font-bold mb-[10px]">
-                Grievance &amp; Service Desk
-              </h3>
-              <p className="text-[var(--color-mut)]">
-                Report issues and track resolution in real-time.
-              </p>
-            </article>
-
-            <article className="bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))] border border-[var(--color-line)] rounded-[18px] p-[32px] transition-all duration-250 hover:bg-[var(--color-card-ref)] hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[3px]">
-              <div className="w-[56px] h-[56px] rounded-[15px] grid place-items-center mb-[26px] bg-[#e8f1ff] text-[#3b82f6]">
-                <Book className="w-[28px] h-[28px]" />
-              </div>
-              <h3 className="text-[20px] font-bold mb-[10px]">
-                Academic Resource Vault
-              </h3>
-              <p className="text-[var(--color-mut)]">
-                Access notes, PYQs, lab manuals and more.
-              </p>
-            </article>
-
-            <article className="bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))] border border-[var(--color-line)] rounded-[18px] p-[32px] transition-all duration-250 hover:bg-[var(--color-card-ref)] hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[3px]">
-              <div className="w-[56px] h-[56px] rounded-[15px] grid place-items-center mb-[26px] bg-[#e4f9ee] text-[#10b981]">
-                <Cart className="w-[28px] h-[28px]" />
-              </div>
-              <h3 className="text-[20px] font-bold mb-[10px]">
-                Student Marketplace
-              </h3>
-              <p className="text-[var(--color-mut)]">
-                Buy, sell and exchange items with verified students.
-              </p>
-            </article>
-
-            <article className="bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))] border border-[var(--color-line)] rounded-[18px] p-[32px] transition-all duration-250 hover:bg-[var(--color-card-ref)] hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[3px]">
-              <div className="w-[56px] h-[56px] rounded-[15px] grid place-items-center mb-[26px] bg-[#f5ebff] text-[#a855f7]">
-                <Cal className="w-[28px] h-[28px]" />
-              </div>
-              <h3 className="text-[20px] font-bold mb-[10px]">
-                Campus Calendar
-              </h3>
-              <p className="text-[var(--color-mut)]">
-                Stay updated with classes, exams, events and deadlines.
-              </p>
-            </article>
-
-            <article className="bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))] border border-[var(--color-line)] rounded-[18px] p-[32px] transition-all duration-250 hover:bg-[var(--color-card-ref)] hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[3px]">
-              <div className="w-[56px] h-[56px] rounded-[15px] grid place-items-center mb-[26px] bg-[#fff6dc] text-[#f59e0b]">
-                <Search className="w-[28px] h-[28px]" />
-              </div>
-              <h3 className="text-[20px] font-bold mb-[10px]">
-                Lost &amp; Found
-              </h3>
-              <p className="text-[var(--color-mut)]">
-                Help campus belongings find their way home.
-              </p>
-            </article>
-
-            <article className="bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))] border border-[var(--color-line)] rounded-[18px] p-[32px] transition-all duration-250 hover:bg-[var(--color-card-ref)] hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[3px]">
-              <div className="w-[56px] h-[56px] rounded-[15px] grid place-items-center mb-[26px] bg-[#e9ecff] text-[#6366f1]">
-                <Users className="w-[28px] h-[28px]" />
-              </div>
-              <h3 className="text-[20px] font-bold mb-[10px]">
-                Student Services
-              </h3>
-              <p className="text-[var(--color-mut)]">
-                Access your profile, notifications, and more.
-              </p>
-            </article>
+            {features.map((feat) => (
+              <FeatureCard
+                key={feat.title}
+                icon={feat.icon}
+                iconBg={feat.iconBg}
+                iconColor={feat.iconColor}
+                title={feat.title}
+                description={feat.description}
+              />
+            ))}
           </div>
         </div>
       </section>

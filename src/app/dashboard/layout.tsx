@@ -141,13 +141,17 @@ export default async function DashboardLayout({
           </label>
           <span className="flex-1"></span>
           <ThemeToggle className="w-[38px] h-[38px] rounded-full grid place-items-center relative border border-[var(--color-line)] bg-[var(--color-card-ref)] text-[var(--color-ink)]" />
-          <button
-            className="w-[38px] h-[38px] rounded-full grid place-items-center relative border border-[var(--color-line)] bg-[var(--color-card-ref)] text-[var(--color-ink)] after:content-[''] after:absolute after:top-[8px] after:right-[9px] after:w-[7px] after:h-[7px] after:rounded-full after:bg-[#ef4444]"
+          <Link
+            href="/dashboard/notifications"
+            className="w-[38px] h-[38px] rounded-full grid place-items-center relative border border-[var(--color-line)] bg-[var(--color-card-ref)] text-[var(--color-ink)] hover:border-[var(--color-navy)] hover:shadow-xs transition-all active:scale-95 cursor-pointer after:content-[''] after:absolute after:top-[8px] after:right-[9px] after:w-[7px] after:h-[7px] after:rounded-full after:bg-[#ef4444]"
             aria-label="Notifications"
           >
             <Bell className="w-[18px] h-[18px]" />
-          </button>
-          <div className="hidden md:flex gap-[10px] items-center pl-[16px] border-l border-[var(--color-line)]">
+          </Link>
+          <Link
+            href="/dashboard/profile"
+            className="hidden md:flex gap-[10px] items-center pl-[16px] border-l border-[var(--color-line)] hover:opacity-85 transition-opacity cursor-pointer"
+          >
             {session.user?.image ? (
               <img
                 src={session.user.image}
@@ -167,7 +171,7 @@ export default async function DashboardLayout({
                 {session.user?.role === "admin" ? "Administrator" : "Student"}
               </small>
             </div>
-          </div>
+          </Link>
         </div>
         <div className="max-w-[1180px] mx-auto p-[20px_16px] md:p-[32px_32px_48px] grid gap-[26px]">
           {children}

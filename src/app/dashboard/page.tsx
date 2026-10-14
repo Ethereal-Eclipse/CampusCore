@@ -17,10 +17,51 @@ import {
 import Link from "next/link"
 import { headers } from "next/headers"
 
+import { StatCard } from "@/components/dashboard/StatCard"
+
 export const instant = false
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
+
+  const stats = [
+    {
+      icon: Ticket,
+      iconColor: "text-[#e11d48]",
+      value: "3",
+      label: "Open Tickets",
+      cardGradient:
+        "bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] to-95%",
+      href: "/dashboard/tickets",
+    },
+    {
+      icon: Book,
+      iconColor: "text-[#2563eb]",
+      value: "24",
+      label: "Resources",
+      cardGradient:
+        "bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] to-95%",
+      href: "/dashboard/vault",
+    },
+    {
+      icon: Cart,
+      iconColor: "text-[#16a34a]",
+      value: "5",
+      label: "My Listings",
+      cardGradient:
+        "bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] to-95%",
+      href: "/dashboard/marketplace",
+    },
+    {
+      icon: Cal,
+      iconColor: "text-[#9333ea]",
+      value: "4",
+      label: "Upcoming Events",
+      cardGradient:
+        "bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] to-95%",
+      href: "/dashboard/calendar",
+    },
+  ]
 
   return (
     <>
@@ -50,80 +91,35 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
-        <div className="rounded-[18px] p-[22px] border border-[var(--color-line)] grid gap-[4px] bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] to-95%">
-          <span className="w-[46px] h-[46px] rounded-[13px] bg-[var(--color-card-ref)] grid place-items-center shadow-[0_2px_8px_rgba(30,58,138,0.1)] mb-[14px] text-[#e11d48]">
-            <Ticket className="w-[20px] h-[20px]" />
-          </span>
-          <b className="text-[34px] leading-[1.1] text-[var(--color-ink)]">3</b>
-          <span className="text-[var(--color-mut)] text-[14px]">
-            Open Tickets
-          </span>
-          <Link
-            href="/dashboard/tickets"
-            className="text-[12px] font-medium mt-[10px] flex gap-[4px] items-center justify-end text-[#e11d48]"
-          >
-            View all <Arr className="w-[13px] h-[13px]" />
+        {stats.map((st) => (
+          <Link key={st.label} href={st.href} className="block group">
+            <StatCard
+              icon={st.icon}
+              iconColor={st.iconColor}
+              value={st.value}
+              label={st.label}
+              cardGradient={st.cardGradient}
+              subtext="Click to view details →"
+            />
           </Link>
-        </div>
-        <div className="rounded-[18px] p-[22px] border border-[var(--color-line)] grid gap-[4px] bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] to-95%">
-          <span className="w-[46px] h-[46px] rounded-[13px] bg-[var(--color-card-ref)] grid place-items-center shadow-[0_2px_8px_rgba(30,58,138,0.1)] mb-[14px] text-[#2563eb]">
-            <Book className="w-[20px] h-[20px]" />
-          </span>
-          <b className="text-[34px] leading-[1.1] text-[var(--color-ink)]">
-            24
-          </b>
-          <span className="text-[var(--color-mut)] text-[14px]">Resources</span>
-          <Link
-            href="/dashboard/vault"
-            className="text-[12px] font-medium mt-[10px] flex gap-[4px] items-center justify-end text-[#2563eb]"
-          >
-            View all <Arr className="w-[13px] h-[13px]" />
-          </Link>
-        </div>
-        <div className="rounded-[18px] p-[22px] border border-[var(--color-line)] grid gap-[4px] bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] to-95%">
-          <span className="w-[46px] h-[46px] rounded-[13px] bg-[var(--color-card-ref)] grid place-items-center shadow-[0_2px_8px_rgba(30,58,138,0.1)] mb-[14px] text-[#16a34a]">
-            <Cart className="w-[20px] h-[20px]" />
-          </span>
-          <b className="text-[34px] leading-[1.1] text-[var(--color-ink)]">5</b>
-          <span className="text-[var(--color-mut)] text-[14px]">
-            My Listings
-          </span>
-          <Link
-            href="/dashboard/marketplace"
-            className="text-[12px] font-medium mt-[10px] flex gap-[4px] items-center justify-end text-[#16a34a]"
-          >
-            View all <Arr className="w-[13px] h-[13px]" />
-          </Link>
-        </div>
-        <div className="rounded-[18px] p-[22px] border border-[var(--color-line)] grid gap-[4px] bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] to-95%">
-          <span className="w-[46px] h-[46px] rounded-[13px] bg-[var(--color-card-ref)] grid place-items-center shadow-[0_2px_8px_rgba(30,58,138,0.1)] mb-[14px] text-[#9333ea]">
-            <Cal className="w-[20px] h-[20px]" />
-          </span>
-          <b className="text-[34px] leading-[1.1] text-[var(--color-ink)]">4</b>
-          <span className="text-[var(--color-mut)] text-[14px]">
-            Upcoming Events
-          </span>
-          <Link
-            href="/dashboard/calendar"
-            className="text-[12px] font-medium mt-[10px] flex gap-[4px] items-center justify-end text-[#9333ea]"
-          >
-            View all <Arr className="w-[13px] h-[13px]" />
-          </Link>
-        </div>
+        ))}
       </div>
 
       <section className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
         <h3 className="text-[17px] flex justify-between items-center mb-[14px] font-semibold">
           Recent Activity{" "}
           <Link
-            href="#"
-            className="text-[13px] text-[var(--color-blue-ref)] font-medium"
+            href="/dashboard/tickets"
+            className="text-[13px] text-[var(--color-blue-ref)] font-medium hover:underline cursor-pointer"
           >
             View all →
           </Link>
         </h3>
-        <div className="flex items-center gap-[14px] py-[11px] border-b border-[var(--color-line)] text-[14px]">
-          <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] text-[#e11d48] grid place-items-center">
+        <Link
+          href="/dashboard/tickets"
+          className="flex items-center gap-[14px] py-[11px] px-[8px] rounded-[10px] border-b border-[var(--color-line)] text-[14px] hover:bg-[var(--color-bg)] transition-colors cursor-pointer group"
+        >
+          <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] text-[#e11d48] grid place-items-center transition-transform group-hover:scale-105">
             <Wifi className="w-[18px] h-[18px]" />
           </span>
           <div>
@@ -138,9 +134,12 @@ export default async function DashboardPage() {
             </span>
             2h ago
           </div>
-        </div>
-        <div className="flex items-center gap-[14px] py-[11px] border-b border-[var(--color-line)] text-[14px]">
-          <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] text-[#2563eb] grid place-items-center">
+        </Link>
+        <Link
+          href="/dashboard/vault"
+          className="flex items-center gap-[14px] py-[11px] px-[8px] rounded-[10px] border-b border-[var(--color-line)] text-[14px] hover:bg-[var(--color-bg)] transition-colors cursor-pointer group"
+        >
+          <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] text-[#2563eb] grid place-items-center transition-transform group-hover:scale-105">
             <Dl className="w-[18px] h-[18px]" />
           </span>
           <div>
@@ -155,9 +154,12 @@ export default async function DashboardPage() {
             </span>
             4h ago
           </div>
-        </div>
-        <div className="flex items-center gap-[14px] py-[11px] text-[14px]">
-          <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] text-[#16a34a] grid place-items-center">
+        </Link>
+        <Link
+          href="/dashboard/marketplace"
+          className="flex items-center gap-[14px] py-[11px] px-[8px] rounded-[10px] text-[14px] hover:bg-[var(--color-bg)] transition-colors cursor-pointer group"
+        >
+          <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] text-[#16a34a] grid place-items-center transition-transform group-hover:scale-105">
             <Cart className="w-[18px] h-[18px]" />
           </span>
           <div>
@@ -169,7 +171,7 @@ export default async function DashboardPage() {
           <div className="ml-auto flex gap-[14px] items-center text-[var(--color-mut)] text-[12px]">
             <span>Listed for ₹450</span>5h ago
           </div>
-        </div>
+        </Link>
       </section>
 
       <section>
@@ -179,7 +181,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-[16px]">
           <Link
             href="/dashboard/tickets"
-            className="flex flex-col items-center gap-[10px] p-[26px_10px] rounded-[18px] border border-[var(--color-line)] font-semibold text-[14px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[var(--shadow-sh)] bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] text-[#e11d48]"
+            className="flex flex-col items-center gap-[10px] p-[26px_10px] rounded-[18px] border border-[var(--color-line)] font-semibold text-[14px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[var(--shadow-sh)] bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] text-[#e11d48] cursor-pointer"
           >
             <Alert className="w-[26px] h-[26px]" />
             <span className="flex gap-[6px] items-center">
@@ -188,7 +190,7 @@ export default async function DashboardPage() {
           </Link>
           <Link
             href="/dashboard/vault"
-            className="flex flex-col items-center gap-[10px] p-[26px_10px] rounded-[18px] border border-[var(--color-line)] font-semibold text-[14px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[var(--shadow-sh)] bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] text-[#2563eb]"
+            className="flex flex-col items-center gap-[10px] p-[26px_10px] rounded-[18px] border border-[var(--color-line)] font-semibold text-[14px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[var(--shadow-sh)] bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] text-[#2563eb] cursor-pointer"
           >
             <Book className="w-[26px] h-[26px]" />
             <span className="flex gap-[6px] items-center">
@@ -197,7 +199,7 @@ export default async function DashboardPage() {
           </Link>
           <Link
             href="/dashboard/marketplace"
-            className="flex flex-col items-center gap-[10px] p-[26px_10px] rounded-[18px] border border-[var(--color-line)] font-semibold text-[14px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[var(--shadow-sh)] bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] text-[#16a34a]"
+            className="flex flex-col items-center gap-[10px] p-[26px_10px] rounded-[18px] border border-[var(--color-line)] font-semibold text-[14px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[var(--shadow-sh)] bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] text-[#16a34a] cursor-pointer"
           >
             <Cart className="w-[26px] h-[26px]" />
             <span className="flex gap-[6px] items-center">
@@ -206,7 +208,7 @@ export default async function DashboardPage() {
           </Link>
           <Link
             href="/dashboard/lost-found"
-            className="flex flex-col items-center gap-[10px] p-[26px_10px] rounded-[18px] border border-[var(--color-line)] font-semibold text-[14px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[var(--shadow-sh)] bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] text-[#9333ea]"
+            className="flex flex-col items-center gap-[10px] p-[26px_10px] rounded-[18px] border border-[var(--color-line)] font-semibold text-[14px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[var(--shadow-sh)] bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] text-[#9333ea] cursor-pointer"
           >
             <Pin className="w-[26px] h-[26px]" />
             <span className="flex gap-[6px] items-center">
@@ -222,14 +224,14 @@ export default async function DashboardPage() {
             Today's Schedule{" "}
             <Link
               href="/dashboard/calendar"
-              className="text-[13px] text-[var(--color-blue-ref)] font-medium"
+              className="text-[13px] text-[var(--color-blue-ref)] font-medium hover:underline cursor-pointer"
             >
               View Calendar →
             </Link>
           </h3>
           <div className="relative grid gap-[16px] py-[6px] before:content-[''] before:absolute before:left-1/2 before:top-[24px] before:bottom-[24px] before:w-[2px] before:bg-[var(--color-line)] before:-translate-x-1/2">
-            <div className="grid grid-cols-[1fr_30px_1fr] items-center">
-              <div className="col-start-1 border border-[var(--color-line)] rounded-[12px] p-[10px_16px] bg-[var(--color-bg)] text-right text-[14px] font-semibold">
+            <div className="grid grid-cols-[1fr_30px_1fr] items-center cursor-pointer group">
+              <div className="col-start-1 border border-[var(--color-line)] rounded-[12px] p-[10px_16px] bg-[var(--color-bg)] text-right text-[14px] font-semibold transition-all group-hover:border-[var(--color-navy)]/40 group-hover:-translate-x-[2px]">
                 Data Structures
                 <small className="block text-[var(--color-mut)] font-normal text-[12px]">
                   C-204
@@ -241,12 +243,12 @@ export default async function DashboardPage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-[1fr_30px_1fr] items-center">
+            <div className="grid grid-cols-[1fr_30px_1fr] items-center cursor-pointer group">
               <span className="col-start-1 text-[var(--color-mut)] text-[13px] pr-[14px] text-right">
                 12:00 PM
               </span>
               <span className="col-start-2 w-[14px] h-[14px] rounded-full bg-[#a855f7] justify-self-center shadow-[0_0_0_5px_var(--color-card-ref)] relative z-10"></span>
-              <div className="col-start-3 border border-[var(--color-line)] rounded-[12px] p-[10px_16px] bg-[var(--color-bg)] text-left text-[14px] font-semibold">
+              <div className="col-start-3 border border-[var(--color-line)] rounded-[12px] p-[10px_16px] bg-[var(--color-bg)] text-left text-[14px] font-semibold transition-all group-hover:border-[var(--color-navy)]/40 group-hover:translate-x-[2px]">
                 Database Management
                 <small className="block text-[var(--color-mut)] font-normal text-[12px]">
                   A-102
@@ -254,8 +256,8 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-[1fr_30px_1fr] items-center">
-              <div className="col-start-1 border border-[var(--color-line)] rounded-[12px] p-[10px_16px] bg-[var(--color-bg)] text-right text-[14px] font-semibold">
+            <div className="grid grid-cols-[1fr_30px_1fr] items-center cursor-pointer group">
+              <div className="col-start-1 border border-[var(--color-line)] rounded-[12px] p-[10px_16px] bg-[var(--color-bg)] text-right text-[14px] font-semibold transition-all group-hover:border-[var(--color-navy)]/40 group-hover:-translate-x-[2px]">
                 Free Time
                 <small className="block text-[var(--color-mut)] font-normal text-[12px]">
                   No class
@@ -278,8 +280,11 @@ export default async function DashboardPage() {
             Trending this week
           </p>
 
-          <div className="flex items-center gap-[14px] border border-[rgba(255,255,255,0.1)] rounded-[12px] p-[12px] mb-[12px] bg-[rgba(255,255,255,0.03)]">
-            <span className="w-[40px] h-[40px] rounded-[13px] bg-[rgba(255,255,255,0.1)] grid place-items-center">
+          <Link
+            href="/dashboard/vault"
+            className="flex items-center gap-[14px] border border-[rgba(255,255,255,0.1)] rounded-[12px] p-[12px] mb-[12px] bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.08)] transition-all cursor-pointer group"
+          >
+            <span className="w-[40px] h-[40px] rounded-[13px] bg-[rgba(255,255,255,0.1)] grid place-items-center transition-transform group-hover:scale-105">
               <Book className="w-[18px] h-[18px]" />
             </span>
             <div>
@@ -288,10 +293,13 @@ export default async function DashboardPage() {
                 1.2k views
               </small>
             </div>
-            <Arr className="w-[15px] h-[15px] text-[#a9b4d6] ml-auto" />
-          </div>
-          <div className="flex items-center gap-[14px] border border-[rgba(255,255,255,0.1)] rounded-[12px] p-[12px] mb-[12px] bg-[rgba(255,255,255,0.03)]">
-            <span className="w-[40px] h-[40px] rounded-[13px] bg-[rgba(255,255,255,0.1)] grid place-items-center">
+            <Arr className="w-[15px] h-[15px] text-[#a9b4d6] ml-auto transition-transform group-hover:translate-x-1" />
+          </Link>
+          <Link
+            href="/dashboard/calendar"
+            className="flex items-center gap-[14px] border border-[rgba(255,255,255,0.1)] rounded-[12px] p-[12px] mb-[12px] bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.08)] transition-all cursor-pointer group"
+          >
+            <span className="w-[40px] h-[40px] rounded-[13px] bg-[rgba(255,255,255,0.1)] grid place-items-center transition-transform group-hover:scale-105">
               <Ticket className="w-[18px] h-[18px]" />
             </span>
             <div>
@@ -300,10 +308,13 @@ export default async function DashboardPage() {
                 420 registrations
               </small>
             </div>
-            <Arr className="w-[15px] h-[15px] text-[#a9b4d6] ml-auto" />
-          </div>
-          <div className="flex items-center gap-[14px] border border-[rgba(255,255,255,0.1)] rounded-[12px] p-[12px] bg-[rgba(255,255,255,0.03)]">
-            <span className="w-[40px] h-[40px] rounded-[13px] bg-[rgba(255,255,255,0.1)] grid place-items-center">
+            <Arr className="w-[15px] h-[15px] text-[#a9b4d6] ml-auto transition-transform group-hover:translate-x-1" />
+          </Link>
+          <Link
+            href="/dashboard/vault"
+            className="flex items-center gap-[14px] border border-[rgba(255,255,255,0.1)] rounded-[12px] p-[12px] bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.08)] transition-all cursor-pointer group"
+          >
+            <span className="w-[40px] h-[40px] rounded-[13px] bg-[rgba(255,255,255,0.1)] grid place-items-center transition-transform group-hover:scale-105">
               <Book className="w-[18px] h-[18px]" />
             </span>
             <div>
@@ -312,8 +323,8 @@ export default async function DashboardPage() {
                 Uploaded 2 hours ago
               </small>
             </div>
-            <Arr className="w-[15px] h-[15px] text-[#a9b4d6] ml-auto" />
-          </div>
+            <Arr className="w-[15px] h-[15px] text-[#a9b4d6] ml-auto transition-transform group-hover:translate-x-1" />
+          </Link>
         </section>
       </div>
 
@@ -322,14 +333,14 @@ export default async function DashboardPage() {
           <h3 className="text-[17px] flex justify-between items-center mb-[14px] font-semibold">
             Your Courses{" "}
             <Link
-              href="#"
-              className="text-[13px] text-[var(--color-blue-ref)] font-medium"
+              href="/dashboard/vault"
+              className="text-[13px] text-[var(--color-blue-ref)] font-medium hover:underline cursor-pointer"
             >
               View all →
             </Link>
           </h3>
           <div className="grid gap-[12px]">
-            <div className="border border-[var(--color-line)] rounded-[12px] p-[12px_14px] text-[14px] font-semibold">
+            <div className="border border-[var(--color-line)] rounded-[12px] p-[12px_14px] text-[14px] font-semibold hover:border-[var(--color-navy)]/40 hover:bg-[var(--color-bg)] transition-all cursor-pointer">
               Data Structures{" "}
               <small className="text-[var(--color-mut)] font-normal">
                 · KCS301 · 89%
@@ -338,7 +349,7 @@ export default async function DashboardPage() {
                 <i className="block h-full bg-gradient-to-r from-[var(--color-navy)] to-[var(--color-blue-ref)] w-[89%]"></i>
               </div>
             </div>
-            <div className="border border-[var(--color-line)] rounded-[12px] p-[12px_14px] text-[14px] font-semibold">
+            <div className="border border-[var(--color-line)] rounded-[12px] p-[12px_14px] text-[14px] font-semibold hover:border-[var(--color-navy)]/40 hover:bg-[var(--color-bg)] transition-all cursor-pointer">
               Database Management{" "}
               <small className="text-[var(--color-mut)] font-normal">
                 · KCS501 · 76%
@@ -347,7 +358,7 @@ export default async function DashboardPage() {
                 <i className="block h-full bg-gradient-to-r from-[var(--color-navy)] to-[var(--color-blue-ref)] w-[76%]"></i>
               </div>
             </div>
-            <div className="border border-[var(--color-line)] rounded-[12px] p-[12px_14px] text-[14px] font-semibold">
+            <div className="border border-[var(--color-line)] rounded-[12px] p-[12px_14px] text-[14px] font-semibold hover:border-[var(--color-navy)]/40 hover:bg-[var(--color-bg)] transition-all cursor-pointer">
               Operating Systems{" "}
               <small className="text-[var(--color-mut)] font-normal">
                 · KCS401 · 91%
@@ -364,13 +375,16 @@ export default async function DashboardPage() {
             Campus Events{" "}
             <Link
               href="/dashboard/calendar"
-              className="text-[13px] text-[var(--color-blue-ref)] font-medium"
+              className="text-[13px] text-[var(--color-blue-ref)] font-medium hover:underline cursor-pointer"
             >
               View all →
             </Link>
           </h3>
-          <div className="flex items-center gap-[14px] py-[11px] border-b border-[var(--color-line)] text-[14px]">
-            <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] text-[#9333ea] grid place-items-center">
+          <Link
+            href="/dashboard/calendar"
+            className="flex items-center gap-[14px] py-[11px] px-[8px] rounded-[10px] border-b border-[var(--color-line)] text-[14px] hover:bg-[var(--color-bg)] transition-colors cursor-pointer group"
+          >
+            <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] text-[#9333ea] grid place-items-center transition-transform group-hover:scale-105">
               <Code className="w-[18px] h-[18px]" />
             </span>
             <div>
@@ -384,9 +398,12 @@ export default async function DashboardPage() {
                 Event
               </span>
             </div>
-          </div>
-          <div className="flex items-center gap-[14px] py-[11px] border-b border-[var(--color-line)] text-[14px]">
-            <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] text-[#2563eb] grid place-items-center">
+          </Link>
+          <Link
+            href="/dashboard/calendar"
+            className="flex items-center gap-[14px] py-[11px] px-[8px] rounded-[10px] border-b border-[var(--color-line)] text-[14px] hover:bg-[var(--color-bg)] transition-colors cursor-pointer group"
+          >
+            <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] text-[#2563eb] grid place-items-center transition-transform group-hover:scale-105">
               <Code className="w-[18px] h-[18px]" />
             </span>
             <div>
@@ -400,9 +417,12 @@ export default async function DashboardPage() {
                 Event
               </span>
             </div>
-          </div>
-          <div className="flex items-center gap-[14px] py-[11px] text-[14px]">
-            <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] text-[#16a34a] grid place-items-center">
+          </Link>
+          <Link
+            href="/dashboard/calendar"
+            className="flex items-center gap-[14px] py-[11px] px-[8px] rounded-[10px] text-[14px] hover:bg-[var(--color-bg)] transition-colors cursor-pointer group"
+          >
+            <span className="w-[40px] h-[40px] rounded-[11px] bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] text-[#16a34a] grid place-items-center transition-transform group-hover:scale-105">
               <Set className="w-[18px] h-[18px]" />
             </span>
             <div>
@@ -416,7 +436,7 @@ export default async function DashboardPage() {
                 Workshop
               </span>
             </div>
-          </div>
+          </Link>
         </section>
       </div>
     </>

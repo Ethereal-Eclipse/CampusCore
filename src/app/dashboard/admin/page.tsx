@@ -11,9 +11,9 @@ import {
   CheckCircle,
   Upload,
   Flag,
-  Search,
-  User,
 } from "@/components/ui/Icons"
+import { StatCard } from "@/components/dashboard/StatCard"
+import { TicketCard, TicketData } from "@/components/tickets/TicketCard"
 
 export const instant = false
 
@@ -27,11 +27,10 @@ export default async function AdminDashboardPage() {
   const role = session.user?.role || "student"
   const isAdmin = role === "admin"
 
-  const dummyMasterTickets = [
+  const dummyMasterTickets: TicketData[] = [
     {
       id: "#1044",
-      student: "Arjun Verma",
-      email: "2501921540102@glbitm.ac.in",
+      student: "Arjun Verma (2501921540102@glbitm.ac.in)",
       title: "Wi-Fi Access Point offline in Computer Lab 3",
       category: "Infrastructure",
       age: "52h ago",
@@ -40,8 +39,7 @@ export default async function AdminDashboardPage() {
     },
     {
       id: "#1043",
-      student: "Priya Nair",
-      email: "2501921540311@glbitm.ac.in",
+      student: "Priya Nair (2501921540311@glbitm.ac.in)",
       title: "Digital library portal session timeout error",
       category: "IT Support",
       age: "6h ago",
@@ -50,8 +48,7 @@ export default async function AdminDashboardPage() {
     },
     {
       id: "#1042",
-      student: "Naman Sharma",
-      email: "2501921540247@glbitm.ac.in",
+      student: "Naman Sharma (2501921540247@glbitm.ac.in)",
       title: "Water dispenser filter replacement in Block B",
       category: "Maintenance",
       age: "18h ago",
@@ -60,8 +57,7 @@ export default async function AdminDashboardPage() {
     },
     {
       id: "#1039",
-      student: "Rohan Das",
-      email: "2501921540440@glbitm.ac.in",
+      student: "Rohan Das (2501921540440@glbitm.ac.in)",
       title: "Air Conditioner thermostat broken in Audi 1",
       category: "Maintenance",
       age: "3d ago",
@@ -117,7 +113,7 @@ export default async function AdminDashboardPage() {
           </div>
           <Link
             href="/dashboard"
-            className="px-[14px] py-[6px] rounded-full bg-[var(--color-card-ref)] border border-[var(--color-line)] font-semibold text-[13px] hover:border-[var(--color-navy)] transition-colors whitespace-nowrap"
+            className="px-[14px] py-[6px] rounded-full bg-[var(--color-card-ref)] border border-[var(--color-line)] font-semibold text-[13px] hover:border-[var(--color-navy)] transition-colors whitespace-nowrap cursor-pointer"
           >
             Back to Student View
           </Link>
@@ -149,73 +145,38 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[16px] p-[20px] shadow-[var(--shadow-sh)]">
-          <div className="flex justify-between items-start mb-[12px]">
-            <span className="text-[var(--color-mut)] text-[13px] font-medium">
-              Open Grievances
-            </span>
-            <span className="w-[32px] h-[32px] rounded-[10px] bg-[#e8f1ff] text-[#3b82f6] grid place-items-center">
-              <Ticket className="w-[16px] h-[16px]" />
-            </span>
-          </div>
-          <div className="text-[26px] font-bold text-[var(--color-ink)] mb-[4px]">
-            14
-          </div>
-          <span className="text-[12px] font-semibold text-[#ef4444] bg-[#ef4444]/10 px-[8px] py-[2px] rounded-md inline-block">
-            1 Escalated (&gt;48h)
-          </span>
-        </div>
-
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[16px] p-[20px] shadow-[var(--shadow-sh)]">
-          <div className="flex justify-between items-start mb-[12px]">
-            <span className="text-[var(--color-mut)] text-[13px] font-medium">
-              Vault Quality Score
-            </span>
-            <span className="w-[32px] h-[32px] rounded-[10px] bg-[#e4f9ee] text-[#10b981] grid place-items-center">
-              <Book className="w-[16px] h-[16px]" />
-            </span>
-          </div>
-          <div className="text-[26px] font-bold text-[var(--color-ink)] mb-[4px]">
-            98.4%
-          </div>
-          <span className="text-[12px] font-semibold text-[#10b981] bg-[#10b981]/10 px-[8px] py-[2px] rounded-md inline-block">
-            2 Items Under Review
-          </span>
-        </div>
-
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[16px] p-[20px] shadow-[var(--shadow-sh)]">
-          <div className="flex justify-between items-start mb-[12px]">
-            <span className="text-[var(--color-mut)] text-[13px] font-medium">
-              Active Listings
-            </span>
-            <span className="w-[32px] h-[32px] rounded-[10px] bg-[#f0e8ff] text-[#7c3aed] grid place-items-center">
-              <Cart className="w-[16px] h-[16px]" />
-            </span>
-          </div>
-          <div className="text-[26px] font-bold text-[var(--color-ink)] mb-[4px]">
-            42
-          </div>
-          <span className="text-[12px] text-[var(--color-mut)]">
-            6 Expired (30-day scan)
-          </span>
-        </div>
-
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[16px] p-[20px] shadow-[var(--shadow-sh)]">
-          <div className="flex justify-between items-start mb-[12px]">
-            <span className="text-[var(--color-mut)] text-[13px] font-medium">
-              Flagged Sellers
-            </span>
-            <span className="w-[32px] h-[32px] rounded-[10px] bg-[#fff6dc] text-[#f59e0b] grid place-items-center">
-              <Flag className="w-[16px] h-[16px]" />
-            </span>
-          </div>
-          <div className="text-[26px] font-bold text-[var(--color-ink)] mb-[4px]">
-            1
-          </div>
-          <span className="text-[12px] font-semibold text-[#f59e0b] bg-[#f59e0b]/10 px-[8px] py-[2px] rounded-md inline-block">
-            Ghosting Reported
-          </span>
-        </div>
+        <StatCard
+          icon={Ticket}
+          iconBg="bg-[#e8f1ff]"
+          iconColor="text-[#3b82f6]"
+          value="14"
+          label="Open Grievances"
+          badge={{ text: "1 Escalated (>48h)", variant: "danger" }}
+        />
+        <StatCard
+          icon={Book}
+          iconBg="bg-[#e4f9ee]"
+          iconColor="text-[#10b981]"
+          value="98.4%"
+          label="Vault Quality Score"
+          badge={{ text: "2 Under Review", variant: "success" }}
+        />
+        <StatCard
+          icon={Cart}
+          iconBg="bg-[#f0e8ff]"
+          iconColor="text-[#7c3aed]"
+          value="42"
+          label="Active Listings"
+          subtext="6 Expired (30-day scan)"
+        />
+        <StatCard
+          icon={Flag}
+          iconBg="bg-[#fff6dc]"
+          iconColor="text-[#f59e0b]"
+          value="1"
+          label="Flagged Sellers"
+          badge={{ text: "Ghosting Reported", variant: "warning" }}
+        />
       </div>
 
       <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[26px] shadow-[var(--shadow-sh)]">
@@ -232,12 +193,12 @@ export default async function AdminDashboardPage() {
           </div>
 
           <div className="flex gap-[8px]">
-            <span className="px-[12px] py-[6px] rounded-lg bg-[var(--color-bg)] border border-[var(--color-line)] text-[12px] font-semibold text-[var(--color-ink)]">
+            <button className="px-[12px] py-[6px] rounded-lg bg-[var(--color-bg)] border border-[var(--color-line)] text-[12px] font-semibold text-[var(--color-ink)] hover:border-[var(--color-navy)] transition-colors cursor-pointer">
               All Tickets (14)
-            </span>
-            <span className="px-[12px] py-[6px] rounded-lg bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/20 text-[12px] font-semibold">
+            </button>
+            <button className="px-[12px] py-[6px] rounded-lg bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/20 text-[12px] font-semibold hover:bg-[#ef4444]/20 transition-colors cursor-pointer">
               Escalated (1)
-            </span>
+            </button>
           </div>
         </div>
 
@@ -254,72 +215,14 @@ export default async function AdminDashboardPage() {
               </p>
             </div>
           </div>
-          <button className="px-[14px] py-[6px] rounded-full bg-[#ea580c] text-white text-[12px] font-semibold shadow-sm hover:bg-[#c2410c] transition-colors shrink-0">
+          <button className="px-[14px] py-[6px] rounded-full bg-[#ea580c] text-white text-[12px] font-semibold shadow-sm hover:bg-[#c2410c] transition-colors shrink-0 cursor-pointer active:scale-95">
             Acknowledge &amp; Dispatch
           </button>
         </div>
 
         <div className="flex flex-col gap-[12px]">
-          {dummyMasterTickets.map((ticket, i) => (
-            <div
-              key={i}
-              className={`p-[16px_20px] rounded-[14px] border ${
-                ticket.escalated
-                  ? "border-[#f97316]/40 bg-[#f97316]/5"
-                  : "border-[var(--color-line)] bg-[var(--color-bg)]"
-              } flex flex-col md:flex-row justify-between md:items-center gap-[14px] transition-colors`}
-            >
-              <div className="flex gap-[16px] items-start">
-                <div
-                  className={`w-[44px] h-[44px] rounded-[12px] ${
-                    ticket.escalated
-                      ? "bg-[#f97316]/10 text-[#ea580c]"
-                      : ticket.status === "Resolved"
-                        ? "bg-[#10b981]/10 text-[#10b981]"
-                        : "bg-[#7c3aed]/10 text-[#7c3aed]"
-                  } grid place-items-center shrink-0 mt-[2px]`}
-                >
-                  <Ticket className="w-[20px] h-[20px]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-[10px] mb-[4px]">
-                    <span className="font-bold text-[14px] text-[var(--color-ink)]">
-                      {ticket.title}
-                    </span>
-                    <span className="text-[12px] font-medium text-[var(--color-mut)]">
-                      {ticket.id}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-[12px] text-[12px] text-[var(--color-mut)]">
-                    <span>Student: {ticket.student}</span>
-                    <span>•</span>
-                    <span>Category: {ticket.category}</span>
-                    <span>•</span>
-                    <span>Age: {ticket.age}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-[10px] self-end md:self-auto">
-                <span
-                  className={`px-[12px] py-[5px] rounded-full text-[12px] font-semibold ${
-                    ticket.escalated
-                      ? "bg-[#f97316] text-white"
-                      : ticket.status === "Resolved"
-                        ? "bg-[#10b981]/15 text-[#10b981]"
-                        : "bg-[#3b82f6]/15 text-[#3b82f6]"
-                  }`}
-                >
-                  {ticket.status}
-                </span>
-
-                {ticket.status !== "Resolved" && (
-                  <button className="px-[14px] py-[6px] rounded-full bg-[var(--color-card-ref)] border border-[#10b981] text-[#10b981] font-semibold text-[12px] hover:bg-[#10b981] hover:text-white transition-colors">
-                    Mark Resolved
-                  </button>
-                )}
-              </div>
-            </div>
+          {dummyMasterTickets.map((ticket) => (
+            <TicketCard key={ticket.id} ticket={ticket} isAdmin={true} />
           ))}
         </div>
       </div>
@@ -350,13 +253,13 @@ export default async function AdminDashboardPage() {
                 placeholder="Document Title (e.g. OS PYQ 2024)"
                 className="px-[12px] py-[8px] rounded-[8px] bg-[var(--color-card-ref)] border border-[var(--color-line)] text-[12px] text-[var(--color-ink)] outline-none"
               />
-              <select className="px-[12px] py-[8px] rounded-[8px] bg-[var(--color-card-ref)] border border-[var(--color-line)] text-[12px] text-[var(--color-ink)] outline-none">
+              <select className="px-[12px] py-[8px] rounded-[8px] bg-[var(--color-card-ref)] border border-[var(--color-line)] text-[12px] text-[var(--color-ink)] outline-none cursor-pointer">
                 <option>CSE - Computer Science</option>
                 <option>IT - Information Tech</option>
                 <option>ECE - Electronics</option>
               </select>
             </div>
-            <button className="w-full py-[8px] rounded-[8px] bg-[#7c3aed] text-white font-semibold text-[13px] shadow-sm hover:opacity-95 transition-opacity">
+            <button className="w-full py-[8px] rounded-[8px] bg-[#7c3aed] text-white font-semibold text-[13px] shadow-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer">
               Publish to Vault
             </button>
           </div>
@@ -379,10 +282,10 @@ export default async function AdminDashboardPage() {
                   </p>
                 </div>
                 <div className="flex gap-[6px] shrink-0">
-                  <button className="px-[10px] py-[5px] rounded-lg bg-[var(--color-card-ref)] border border-[var(--color-line)] text-[11px] font-medium hover:border-[var(--color-navy)] transition-colors">
+                  <button className="px-[10px] py-[5px] rounded-lg bg-[var(--color-card-ref)] border border-[var(--color-line)] text-[11px] font-medium hover:border-[var(--color-navy)] transition-colors cursor-pointer active:scale-95">
                     Keep
                   </button>
-                  <button className="px-[10px] py-[5px] rounded-lg bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/30 text-[11px] font-semibold hover:bg-[#ef4444] hover:text-white transition-colors">
+                  <button className="px-[10px] py-[5px] rounded-lg bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/30 text-[11px] font-semibold hover:bg-[#ef4444] hover:text-white transition-colors cursor-pointer active:scale-95">
                     Remove
                   </button>
                 </div>
@@ -444,10 +347,10 @@ export default async function AdminDashboardPage() {
                 </div>
                 <p className="text-[12px] text-[#b45309]">{seller.reason}</p>
                 <div className="flex gap-[8px] justify-end pt-[4px]">
-                  <button className="px-[12px] py-[5px] rounded-lg bg-[var(--color-card-ref)] border border-[var(--color-line)] text-[11px] font-medium hover:border-[var(--color-navy)] transition-colors">
+                  <button className="px-[12px] py-[5px] rounded-lg bg-[var(--color-card-ref)] border border-[var(--color-line)] text-[11px] font-medium hover:border-[var(--color-navy)] transition-colors cursor-pointer active:scale-95">
                     Send Warning Email
                   </button>
-                  <button className="px-[12px] py-[5px] rounded-lg bg-[#ef4444] text-white text-[11px] font-semibold shadow-sm hover:bg-[#dc2626] transition-colors">
+                  <button className="px-[12px] py-[5px] rounded-lg bg-[#ef4444] text-white text-[11px] font-semibold shadow-sm hover:bg-[#dc2626] transition-colors cursor-pointer active:scale-95">
                     Suspend User
                   </button>
                 </div>
