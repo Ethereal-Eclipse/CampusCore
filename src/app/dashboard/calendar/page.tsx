@@ -1,10 +1,20 @@
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import { Cal } from "@/components/ui/Icons"
 import { ModuleHeader } from "@/components/layout/ModuleHeader"
 import { EventCard, EventData } from "@/components/calendar/EventCard"
+import { AdminCalendarView } from "@/components/calendar/AdminCalendarView"
 
 export const instant = false
 
 export default async function CalendarPage() {
+  const session = await getServerSession(authOptions)
+  const isAdmin = session?.user?.role === "admin"
+
+  if (isAdmin) {
+    return <AdminCalendarView />
+  }
+
   const dummyEvents: EventData[] = [
     {
       title: "Data Structures Lab",

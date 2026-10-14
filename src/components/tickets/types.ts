@@ -15,12 +15,17 @@ export interface StaffMember {
   initials: string
 }
 
+export type TicketPriority = "low" | "medium" | "high" | "critical"
+
 export interface Ticket {
   id: string
   title: string
   description: string
   category: string
   department: string
+  location?: string
+  priority?: TicketPriority
+  contactPhone?: string
   status: TicketStatus
   raisedBy: {
     name: string

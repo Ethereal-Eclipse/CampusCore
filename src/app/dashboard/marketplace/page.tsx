@@ -1,9 +1,19 @@
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import { ModuleHeader } from "@/components/layout/ModuleHeader"
 import { ProductCard, ProductData } from "@/components/marketplace/ProductCard"
+import { AdminMarketplaceView } from "@/components/marketplace/AdminMarketplaceView"
 
 export const instant = false
 
 export default async function MarketplacePage() {
+  const session = await getServerSession(authOptions)
+  const isAdmin = session?.user?.role === "admin"
+
+  if (isAdmin) {
+    return <AdminMarketplaceView />
+  }
+
   const dummyItems: ProductData[] = [
     {
       title: "Casio Scientific Calculator",

@@ -108,7 +108,9 @@ export default async function DashboardPage() {
       <div className="flex justify-between items-start gap-[16px] flex-wrap">
         <div>
           <h2 className="text-[32px] tracking-[-0.5px] text-[var(--color-navy)] font-bold">
-            Good morning {session?.user?.name?.split(" ")[0]} 👋
+            {isAdmin
+              ? `Welcome ${session?.user?.name || "Admin"} 👋`
+              : `Hello ${session?.user?.name?.split(" ")[0] || "Student"} 👋`}
           </h2>
           <p className="text-[var(--color-mut)]">
             {isAdmin

@@ -21,6 +21,9 @@ interface TicketContextType {
     category: string
     department: string
     description: string
+    location?: string
+    priority?: Ticket["priority"]
+    contactPhone?: string
   }) => Ticket
 }
 
@@ -202,14 +205,26 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       category: string
       department: string
       description: string
+      location?: string
+      priority?: Ticket["priority"]
+      contactPhone?: string
     }) => {
       const newId = `#${1045 + Math.floor(Math.random() * 100)}`
+      const catLower = data.category.toLowerCase()
+      let icon: Ticket["icon"] = "ticket"
+      if (catLower.includes("wi-fi") || catLower.includes("network")) icon = "wifi"
+      else if (catLower.includes("classroom") || catLower.includes("projector") || catLower.includes("lab")) icon = "monitor"
+      else if (catLower.includes("water") || catLower.includes("cooler") || catLower.includes("plumbing")) icon = "droplet"
+
       const newTicket: Ticket = {
         id: newId,
         title: data.title,
         description: data.description,
         category: data.category,
         department: data.department,
+        location: data.location,
+        priority: data.priority || "medium",
+        contactPhone: data.contactPhone,
         status: "pending",
         raisedBy: {
           name: "Campus Student",
@@ -218,10 +233,10 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         },
         assignedTo: null,
         openedAt: "Just now",
-        expectedReply: "Within 24 hours",
+        expectedReply: data.priority === "high" || data.priority === "critical" ? "Within 6 hours" : "Within 24 hours",
         age: "0h",
         ageHours: 0,
-        icon: "ticket",
+        icon,
         updates: [
           {
             id: `u-${Date.now()}`,

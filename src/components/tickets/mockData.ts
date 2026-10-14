@@ -32,6 +32,9 @@ export const initialTickets: Ticket[] = [
     expectedReply: "Immediate dispatch",
     age: "52h",
     ageHours: 52,
+    location: "Computer Lab 3, 2nd Floor (AB Block)",
+    priority: "high",
+    contactPhone: "+91 98765 43210",
     icon: "wifi",
     updates: [
       {

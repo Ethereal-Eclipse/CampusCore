@@ -1,10 +1,20 @@
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import { Search } from "@/components/ui/Icons"
 import { ModuleHeader } from "@/components/layout/ModuleHeader"
 import { ResourceCard, ResourceData } from "@/components/vault/ResourceCard"
+import { AdminVaultView } from "@/components/vault/AdminVaultView"
 
 export const instant = false
 
 export default async function VaultPage() {
+  const session = await getServerSession(authOptions)
+  const isAdmin = session?.user?.role === "admin"
+
+  if (isAdmin) {
+    return <AdminVaultView />
+  }
+
   const dummyResources: ResourceData[] = [
     {
       title: "Data Structures Notes",

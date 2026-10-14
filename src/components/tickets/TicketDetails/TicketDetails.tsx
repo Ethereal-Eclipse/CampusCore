@@ -31,6 +31,43 @@ export function TicketDetails({
         {ticket.category}
       </span>
 
+      {ticket.location && (
+        <>
+          <span className="text-[var(--color-mut)]">Location</span>
+          <span className="text-[var(--color-ink)] font-medium">
+            {ticket.location}
+          </span>
+        </>
+      )}
+
+      {ticket.priority && (
+        <>
+          <span className="text-[var(--color-mut)]">Priority</span>
+          <span className="capitalize font-semibold text-[12px]">
+            <span
+              className={`px-[8px] py-[2px] rounded-full inline-block ${
+                ticket.priority === "critical" || ticket.priority === "high"
+                  ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                  : ticket.priority === "medium"
+                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                    : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+              }`}
+            >
+              {ticket.priority}
+            </span>
+          </span>
+        </>
+      )}
+
+      {ticket.contactPhone && (
+        <>
+          <span className="text-[var(--color-mut)]">Contact</span>
+          <span className="text-[var(--color-ink)] font-medium">
+            {ticket.contactPhone}
+          </span>
+        </>
+      )}
+
       {showAssignee && (
         <>
           <span className="text-[var(--color-mut)]">Assigned to</span>
