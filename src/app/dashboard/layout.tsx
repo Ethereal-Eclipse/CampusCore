@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/Icons"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { LogoutButton } from "@/components/layout/LogoutButton"
+import { BfCacheGuard } from "@/components/layout/BfCacheGuard"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
@@ -32,6 +33,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[255px_1fr] min-h-screen text-[var(--color-ink)] bg-[var(--color-bg)]">
+      <BfCacheGuard />
       <aside className="hidden md:flex flex-col bg-[var(--color-card-ref)] border-r border-[var(--color-line)] sticky top-0 h-screen">
         <Link
           href="/"
