@@ -1,9 +1,8 @@
-"use client"
-
+import React from "react"
 import { LucideIcon } from "lucide-react"
 
 interface StatCardProps {
-  icon: LucideIcon
+  icon: LucideIcon | React.ReactNode
   iconBg?: string
   iconColor?: string
   value: string | number
@@ -14,11 +13,10 @@ interface StatCardProps {
     variant?: "danger" | "success" | "warning" | "info" | "purple"
   }
   cardGradient?: string
-  onClick?: () => void
 }
 
 export function StatCard({
-  icon: Icon,
+  icon,
   iconBg = "bg-[var(--color-card-ref)]",
   iconColor = "text-[var(--color-navy)]",
   value,
@@ -26,7 +24,6 @@ export function StatCard({
   subtext,
   badge,
   cardGradient,
-  onClick,
 }: StatCardProps) {
   const badgeClasses = {
     danger: "text-[#ef4444] bg-[#ef4444]/10",
@@ -36,9 +33,22 @@ export function StatCard({
     purple: "text-[#7c3aed] bg-[#7c3aed]/10",
   }
 
+  const renderIcon = () => {
+    if (React.isValidElement(icon)) {
+      return icon
+    }
+    if (
+      typeof icon === "function" ||
+      (typeof icon === "object" && icon !== null)
+    ) {
+      const IconComponent = icon as LucideIcon
+      return <IconComponent className="w-[20px] h-[20px]" />
+    }
+    return null
+  }
+
   return (
     <div
-      onClick={onClick}
       className={`rounded-[18px] p-[22px] border border-[var(--color-line)] shadow-[var(--shadow-sh)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(30,58,138,0.08)] cursor-pointer group flex flex-col justify-between ${
         cardGradient
           ? cardGradient
@@ -50,7 +60,7 @@ export function StatCard({
           <span
             className={`w-[44px] h-[44px] rounded-[13px] grid place-items-center shadow-[0_2px_8px_rgba(30,58,138,0.08)] transition-transform duration-200 group-hover:scale-105 ${iconBg} ${iconColor}`}
           >
-            <Icon className="w-[20px] h-[20px]" />
+            {renderIcon()}
           </span>
           {badge && (
             <span

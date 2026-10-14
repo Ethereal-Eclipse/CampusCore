@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react"
 import { Bell } from "@/components/ui/Icons"
 
@@ -15,16 +13,11 @@ export interface NotificationData {
 
 interface NotificationItemProps {
   notification: NotificationData
-  onClick?: () => void
 }
 
-export function NotificationItem({
-  notification,
-  onClick,
-}: NotificationItemProps) {
+export function NotificationItem({ notification }: NotificationItemProps) {
   return (
     <div
-      onClick={onClick}
       className={`flex gap-[16px] p-[16px] rounded-[14px] border border-[var(--color-line)] transition-all duration-200 cursor-pointer hover:shadow-[0_4px_16px_rgba(30,58,138,0.06)] hover:-translate-y-[1px] ${
         notification.read
           ? "bg-[var(--color-bg)] opacity-75 hover:opacity-100 hover:border-[var(--color-navy)]/30"

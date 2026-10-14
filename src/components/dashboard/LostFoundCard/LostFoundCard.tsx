@@ -1,5 +1,3 @@
-"use client"
-
 import { Search } from "@/components/ui/Icons"
 
 export interface LostFoundData {
@@ -14,10 +12,9 @@ export interface LostFoundData {
 
 interface LostFoundCardProps {
   item: LostFoundData
-  onClick?: () => void
 }
 
-export function LostFoundCard({ item, onClick }: LostFoundCardProps) {
+export function LostFoundCard({ item }: LostFoundCardProps) {
   const typeColors: Record<string, string> = {
     Lost: "bg-[#ffecee] text-[#ef4444]",
     Found: "bg-[#e4f9ee] text-[#10b981]",
@@ -27,10 +24,7 @@ export function LostFoundCard({ item, onClick }: LostFoundCardProps) {
     item.color || typeColors[item.type] || "bg-[#ffecee] text-[#ef4444]"
 
   return (
-    <div
-      onClick={onClick}
-      className="flex gap-[16px] bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)] transition-all duration-200 hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[2px] hover:border-[var(--color-navy)]/30 cursor-pointer group"
-    >
+    <div className="flex gap-[16px] bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)] transition-all duration-200 hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[2px] hover:border-[var(--color-navy)]/30 cursor-pointer group">
       <div className="w-[80px] h-[80px] bg-[var(--color-bg)] rounded-[12px] border border-[var(--color-line)] flex items-center justify-center shrink-0 overflow-hidden">
         {item.image ? (
           <img
