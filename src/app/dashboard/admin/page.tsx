@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
@@ -13,7 +14,8 @@ import {
   Flag,
 } from "@/components/ui/Icons"
 import { StatCard } from "@/components/dashboard/StatCard"
-import { TicketCard, TicketData } from "@/components/tickets/TicketCard"
+import { TicketProvider } from "@/components/tickets/TicketContext"
+import { AdminManagementList } from "@/components/tickets/AdminManagementList"
 
 export const instant = false
 
@@ -26,45 +28,6 @@ export default async function AdminDashboardPage() {
 
   const role = session.user?.role || "student"
   const isAdmin = role === "admin"
-
-  const dummyMasterTickets: TicketData[] = [
-    {
-      id: "#1044",
-      student: "Arjun Verma (25019cs102@glbitm.ac.in)",
-      title: "Wi-Fi Access Point offline in Computer Lab 3",
-      category: "Infrastructure",
-      age: "52h ago",
-      escalated: true,
-      status: "Escalated",
-    },
-    {
-      id: "#1043",
-      student: "Priya Nair (25019it311@glbitm.ac.in)",
-      title: "Digital library portal session timeout error",
-      category: "IT Support",
-      age: "6h ago",
-      escalated: false,
-      status: "Pending",
-    },
-    {
-      id: "#1042",
-      student: "Naman Sharma (25019cs247@glbitm.ac.in)",
-      title: "Water dispenser filter replacement in Block B",
-      category: "Maintenance",
-      age: "18h ago",
-      escalated: false,
-      status: "In Progress",
-    },
-    {
-      id: "#1039",
-      student: "Rohan Das (25019ec440@glbitm.ac.in)",
-      title: "Air Conditioner thermostat broken in Audi 1",
-      category: "Maintenance",
-      age: "3d ago",
-      escalated: false,
-      status: "Resolved",
-    },
-  ]
 
   const dummyFlaggedResources = [
     {
@@ -180,51 +143,27 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[26px] shadow-[var(--shadow-sh)]">
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-[14px] mb-[20px]">
-          <div>
-            <h2 className="text-[18px] font-bold text-[var(--color-ink)] flex items-center gap-[10px]">
-              <span className="w-[10px] h-[10px] rounded-full bg-[#7c3aed]" />
-              1. Grievance Desk • Master Issue Board
-            </h2>
-            <p className="text-[var(--color-mut)] text-[13px] mt-[2px]">
-              Triage open student submissions and resolve escalated campus
-              infrastructure concerns.
-            </p>
-          </div>
-
-          <div className="flex gap-[8px]">
-            <button className="px-[12px] py-[6px] rounded-lg bg-[var(--color-bg)] border border-[var(--color-line)] text-[12px] font-semibold text-[var(--color-ink)] hover:border-[var(--color-navy)] transition-colors cursor-pointer">
-              All Tickets (14)
-            </button>
-            <button className="px-[12px] py-[6px] rounded-lg bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/20 text-[12px] font-semibold hover:bg-[#ef4444]/20 transition-colors cursor-pointer">
-              Escalated (1)
-            </button>
-          </div>
+        <div className="mb-[20px]">
+          <h2 className="text-[18px] font-bold text-[var(--color-ink)] flex items-center gap-[10px]">
+            <span className="w-[10px] h-[10px] rounded-full bg-[#7c3aed]" />
+            1. Grievance Desk • Master Management Console
+          </h2>
+          <p className="text-[var(--color-mut)] text-[13px] mt-[2px]">
+            Triage open student submissions, reassign staff, and resolve escalated campus concerns.
+          </p>
         </div>
 
-        <div className="p-[14px_16px] rounded-[12px] bg-[#f97316]/10 border border-[#f97316]/30 mb-[18px] flex items-center justify-between gap-[12px]">
-          <div className="flex items-center gap-[12px]">
-            <AlertTriangle className="w-[20px] h-[20px] text-[#f97316] shrink-0" />
-            <div>
-              <p className="text-[13px] font-bold text-[#c2410c]">
-                Escalation Alert: Ticket #1044 Unresolved &gt; 48 Hours
-              </p>
-              <p className="text-[12px] text-[#9a3412]">
-                Auto-escalation notification sent to Senior Administrator.
-                Action required immediately.
-              </p>
+        <Suspense
+          fallback={
+            <div className="p-[32px] rounded-[14px] bg-[var(--color-bg)] border border-[var(--color-line)] text-center text-[var(--color-mut)]">
+              Loading grievance management console...
             </div>
-          </div>
-          <button className="px-[14px] py-[6px] rounded-full bg-[#ea580c] text-white text-[12px] font-semibold shadow-sm hover:bg-[#c2410c] transition-colors shrink-0 cursor-pointer active:scale-95">
-            Acknowledge &amp; Dispatch
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-[12px]">
-          {dummyMasterTickets.map((ticket) => (
-            <TicketCard key={ticket.id} ticket={ticket} isAdmin={true} />
-          ))}
-        </div>
+          }
+        >
+          <TicketProvider>
+            <AdminManagementList />
+          </TicketProvider>
+        </Suspense>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-[24px]">

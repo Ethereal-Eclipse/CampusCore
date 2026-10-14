@@ -4,7 +4,7 @@ export interface TicketUpdate {
   id: string
   message: string
   timestamp: string
-  type: "submitted" | "assigned" | "in_progress" | "resolved" | "note" | "escalated"
+  type: "submitted" | "assigned" | "in_progress" | "resolved" | "note" | "escalated" | "pending"
   author?: string
 }
 
