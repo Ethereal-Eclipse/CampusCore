@@ -12,10 +12,10 @@ import {
   Out,
 } from "@/components/ui/Icons"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
+import { LogoutButton } from "@/components/layout/LogoutButton"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { headers } from "next/headers"
 
 export const instant = false
 
@@ -27,7 +27,7 @@ export default async function DashboardLayout({
   const session = await getServerSession(authOptions)
 
   if (!session) {
-    redirect("/")
+    redirect("/login")
   }
 
   return (
@@ -104,12 +104,7 @@ export default async function DashboardLayout({
           >
             <Set className="w-[18px] h-[18px]" /> Settings
           </Link>
-          <Link
-            href="/api/auth/signout"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <Out className="w-[18px] h-[18px]" /> Log out
-          </Link>
+          <LogoutButton />
         </nav>
         <img
           className="m-auto mx-[16px] mb-[18px] rounded-[14px] shadow-[var(--shadow-sh)] block w-[calc(100%-32px)]"
@@ -137,17 +132,23 @@ export default async function DashboardLayout({
             <Bell className="w-[18px] h-[18px]" />
           </button>
           <div className="hidden md:flex gap-[10px] items-center pl-[16px] border-l border-[var(--color-line)]">
-            <div className="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-[var(--color-navy)] to-[#a855f7] text-white grid place-items-center font-bold">
-              {session.user?.name?.charAt(0) || "U"}
-            </div>
+            {session.user?.image ? (
+              <img
+                src={session.user.image}
+                alt={session.user.name || "User"}
+                className="w-[38px] h-[38px] rounded-full object-cover border border-[var(--color-line)]"
+              />
+            ) : (
+              <div className="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-[var(--color-navy)] to-[#a855f7] text-white grid place-items-center font-bold">
+                {session.user?.name?.charAt(0) || "U"}
+              </div>
+            )}
             <div>
               <b className="text-[14px] leading-[1.3] block text-[var(--color-ink)]">
                 {session.user?.name}
               </b>
               <small className="text-[var(--color-mut)] block text-[12px] leading-[1.3]">
-                {(session.user as any)?.role === "admin"
-                  ? "Administrator"
-                  : "Student"}
+                {session.user?.role === "admin" ? "Administrator" : "Student"}
               </small>
             </div>
           </div>

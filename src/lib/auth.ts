@@ -4,84 +4,135 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { connectDB } from "./mongoose"
 import User from "@/models/User"
 
+const googleClientId =
+  process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID || ""
+const googleClientSecret =
+  process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET || ""
+
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   providers: [
-    GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID || "dummy",
-      clientSecret: process.env.AUTH_GOOGLE_SECRET || "dummy",
-    }),
+    ...(googleClientId && googleClientSecret
+      ? [
+          GoogleProvider({
+            clientId: googleClientId,
+            clientSecret: googleClientSecret,
+          }),
+        ]
+      : [
+          GoogleProvider({
+            clientId: "dummy-client-id",
+            clientSecret: "dummy-client-secret",
+          }),
+        ]),
     CredentialsProvider({
+      id: "credentials",
       name: "Development Fallback",
       credentials: {
-        name: { label: "Name", type: "text", placeholder: "Test User" },
+        name: { label: "Name", type: "text", placeholder: "Student Name" },
         email: {
           label: "Email",
           type: "text",
-          placeholder: "test@example.edu",
+          placeholder: "student@glbitm.ac.in",
         },
+        role: { label: "Role", type: "text", placeholder: "student" },
       },
       async authorize(credentials) {
         if (!credentials?.email) return null
+
+        const email = credentials.email.trim().toLowerCase()
+        const name = credentials.name?.trim() || "Campus Student"
+        const role = credentials.role === "admin" ? "admin" : "student"
+
+        if (process.env.MONGODB_URI) {
+          try {
+            await connectDB()
+            let dbUser = await User.findOne({ email })
+            if (!dbUser) {
+              dbUser = await User.create({
+                name,
+                email,
+                role,
+              })
+            }
+            return {
+              id: dbUser._id.toString(),
+              name: dbUser.name,
+              email: dbUser.email,
+              role: dbUser.role,
+            }
+          } catch (e) {
+            console.error("DB error in credentials authorize:", e)
+          }
+        }
+
         return {
-          id: "1",
-          name: credentials.name,
-          email: credentials.email,
-          role: "student",
+          id: "dev-user-id",
+          name,
+          email,
+          role,
         }
       },
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
         const campusDomain = process.env.CAMPUS_DOMAIN
-        if (campusDomain && !user.email?.endsWith(`@${campusDomain}`)) {
-          return false
+        if (
+          campusDomain &&
+          !user.email?.toLowerCase().endsWith(`@${campusDomain.toLowerCase()}`)
+        ) {
+          return "/login?error=AccessDenied"
         }
 
         if (process.env.MONGODB_URI) {
           try {
             await connectDB()
-            const existingUser = await User.findOne({ email: user.email })
-            if (!existingUser) {
-              await User.create({
-                name: user.name,
+            let dbUser = await User.findOne({ email: user.email })
+            if (!dbUser) {
+              dbUser = await User.create({
+                name: user.name || "Student",
                 email: user.email,
                 image: user.image,
                 role: "student",
               })
+            } else if (user.image && dbUser.image !== user.image) {
+              dbUser.image = user.image
+              await dbUser.save()
             }
+            user.id = dbUser._id.toString()
+            user.role = dbUser.role
           } catch (e) {
-            console.error("DB connection failed during sign in", e)
+            console.error("DB error during Google sign-in:", e)
           }
         }
         return true
       }
-      if (account?.provider === "credentials") return true
+
+      if (account?.provider === "credentials") {
+        return true
+      }
+
       return false
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.role = user.role || "student"
+      }
+      return token
     },
     async session({ session, token }) {
       if (session.user) {
-        if (process.env.MONGODB_URI) {
-          try {
-            await connectDB()
-            const dbUser = await User.findOne({ email: session.user.email })
-            if (dbUser) {
-              ;(session.user as any).role = dbUser.role
-              ;(session.user as any).id = dbUser._id.toString()
-            }
-          } catch (e) {
-            ;(session.user as any).role = "student"
-          }
-        } else {
-          ;(session.user as any).role = "student"
-        }
+        session.user.id = (token.id as string) || (token.sub as string)
+        session.user.role = (token.role as "student" | "admin") || "student"
       }
       return session
     },
   },
   pages: {
-    signIn: "/", // Or a dedicated login page
+    signIn: "/login",
   },
   session: {
     strategy: "jwt",
