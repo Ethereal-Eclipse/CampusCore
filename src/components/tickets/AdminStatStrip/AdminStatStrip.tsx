@@ -15,15 +15,15 @@ export function AdminStatStrip({ tickets, className = "" }: AdminStatStripProps)
   ).length
 
   const stats = [
-    { label: "Open", value: openCount || 14, color: "text-[var(--color-ink)]" },
+    { label: "Open", value: openCount, color: "text-[var(--color-ink)]" },
     {
       label: "Overdue",
-      value: overdueCount || 1,
+      value: overdueCount,
       color: "text-red-400",
     },
     {
       label: "Unassigned",
-      value: unassignedCount || 3,
+      value: unassignedCount,
       color: "text-amber-400",
     },
     {

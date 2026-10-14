@@ -1,19 +1,11 @@
 import Link from "next/link"
 import {
   Grid,
-  Ticket,
-  Book,
-  Cart,
-  Cal,
   Search,
   Bell,
-  User,
-  Set,
-  Out,
-  Shield,
 } from "@/components/ui/Icons"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
-import { LogoutButton } from "@/components/layout/LogoutButton"
+import { SidebarNav } from "@/components/layout/SidebarNav"
 import { BfCacheGuard } from "@/components/layout/BfCacheGuard"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
@@ -45,83 +37,7 @@ export default async function DashboardLayout({
           </i>
           CampusCore
         </Link>
-        <nav className="p-[20px_16px] grid gap-[4px]">
-          <Link
-            href="/dashboard"
-            className="p-[10px_14px] rounded-[10px] text-[15px] font-medium flex items-center gap-[12px] bg-gradient-to-r from-[var(--color-navy)] to-[var(--color-navy2)] text-white"
-          >
-            <Grid className="w-[18px] h-[18px]" /> Dashboard
-          </Link>
-          <Link
-            href="/dashboard/tickets"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <Ticket className="w-[18px] h-[18px]" /> Tickets
-          </Link>
-          <Link
-            href="/dashboard/vault"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <Book className="w-[18px] h-[18px]" /> Academic Vault
-          </Link>
-          <Link
-            href="/dashboard/marketplace"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <Cart className="w-[18px] h-[18px]" /> Marketplace
-          </Link>
-          <Link
-            href="/dashboard/calendar"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <Cal className="w-[18px] h-[18px]" /> Calendar
-          </Link>
-          <Link
-            href="/dashboard/lost-found"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <Search className="w-[18px] h-[18px]" /> Lost &amp; Found
-          </Link>
-          <Link
-            href="/dashboard/notifications"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <Bell className="w-[18px] h-[18px]" /> Notifications
-            <span className="ml-auto bg-[#ef4444] text-white rounded-full min-w-[22px] text-center text-[11px] py-[2px]">
-              3
-            </span>
-          </Link>
-
-          <small className="p-[14px_14px_6px] text-[var(--color-mut)] text-[12px] tracking-[0.5px] font-semibold">
-            MANAGEMENT
-          </small>
-          <Link
-            href="/dashboard/admin"
-            className="p-[10px_14px] rounded-[10px] text-[#7c3aed] text-[15px] font-semibold flex items-center gap-[12px] hover:bg-[#7c3aed]/10 transition-colors"
-          >
-            <Shield className="w-[18px] h-[18px]" /> Admin Console
-            <span className="ml-auto bg-[#7c3aed] text-white rounded-full px-[8px] text-center text-[10px] py-[2px]">
-              {session.user?.role === "admin" ? "ADMIN" : "PREVIEW"}
-            </span>
-          </Link>
-
-          <small className="p-[14px_14px_6px] text-[var(--color-mut)] text-[12px] tracking-[0.5px] font-semibold">
-            ACCOUNT
-          </small>
-          <Link
-            href="/dashboard/profile"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <User className="w-[18px] h-[18px]" /> Profile
-          </Link>
-          <Link
-            href="/dashboard/settings"
-            className="p-[10px_14px] rounded-[10px] text-[var(--color-mut)] text-[15px] font-medium flex items-center gap-[12px] hover:bg-[var(--color-bu)] transition-colors"
-          >
-            <Set className="w-[18px] h-[18px]" /> Settings
-          </Link>
-          <LogoutButton />
-        </nav>
+        <SidebarNav userRole={session.user?.role} />
         <img
           className="m-auto mx-[16px] mb-[18px] rounded-[14px] shadow-[var(--shadow-sh)] block w-[calc(100%-32px)]"
           src="/assets/promo.png"

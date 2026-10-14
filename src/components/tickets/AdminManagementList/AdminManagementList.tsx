@@ -7,7 +7,9 @@ import { AdminStatStrip } from "../AdminStatStrip"
 import { AdminAttentionBanner } from "../AdminAttentionBanner"
 import { AdminTicketRow } from "../AdminTicketRow"
 import { AdminTicketDrawer } from "../AdminTicketDrawer"
+import { AdminBoardView } from "../AdminBoardView"
 import { ArrowUpDown } from "@/components/ui/Icons"
+import { isTicketEscalated } from "../sla"
 
 export function AdminManagementList() {
   const { tickets, selectedTicketId, selectTicket } = useTickets()
@@ -44,14 +46,20 @@ export function AdminManagementList() {
 
     // Status filter
     if (statusFilter !== "all") {
-      list = list.filter((t) => t.status === statusFilter)
+      if (statusFilter === "escalated") {
+        list = list.filter(isTicketEscalated)
+      } else {
+        list = list.filter((t) => t.status === statusFilter)
+      }
     }
 
     // Sort: oldest first (default) vs newest first
     list.sort((a, b) => {
-      // Escalated rows are pinned to the top!
-      if (a.status === "escalated" && b.status !== "escalated") return -1
-      if (a.status !== "escalated" && b.status === "escalated") return 1
+      // Escalated / SLA breached rows are pinned to the top!
+      const aEsc = isTicketEscalated(a)
+      const bEsc = isTicketEscalated(b)
+      if (aEsc && !bEsc) return -1
+      if (!aEsc && bEsc) return 1
 
       if (sortOrder === "oldest") {
         return b.ageHours - a.ageHours
@@ -145,36 +153,42 @@ export function AdminManagementList() {
         </button>
       </div>
 
-      {/* 4. Column Header Row & Table matching Image 1 */}
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)]">
-        {/* Column Headers */}
-        <div className="hidden md:flex items-center justify-between text-[12px] font-semibold text-[var(--color-mut)] px-[20px] pb-[12px] uppercase tracking-wider">
-          <span className="flex-1">Issue</span>
-          <div className="flex items-center gap-[24px]">
-            <span className="w-[130px]">Assigned to</span>
-            <span className="w-[50px]">Age</span>
-            <span className="w-[95px] text-right">Status</span>
+      {/* 4. List View or Board View */}
+      {activeTab === "board" ? (
+        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[24px] shadow-[var(--shadow-sh)]">
+          <AdminBoardView />
+        </div>
+      ) : (
+        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)]">
+          {/* Column Headers */}
+          <div className="hidden md:flex items-center justify-between text-[12px] font-semibold text-[var(--color-mut)] px-[20px] pb-[12px] uppercase tracking-wider">
+            <span className="flex-1">Issue</span>
+            <div className="flex items-center gap-[24px]">
+              <span className="w-[130px]">Assigned to</span>
+              <span className="w-[50px]">Age</span>
+              <span className="w-[95px] text-right">Status</span>
+            </div>
+          </div>
+
+          {/* Rows */}
+          <div className="flex flex-col gap-[10px]">
+            {filteredTickets.length > 0 ? (
+              filteredTickets.map((ticket) => (
+                <AdminTicketRow
+                  key={ticket.id}
+                  ticket={ticket}
+                  isSelected={selectedTicketId === ticket.id}
+                  onClick={() => selectTicket(ticket.id)}
+                />
+              ))
+            ) : (
+              <div className="p-[32px] text-center text-[var(--color-mut)] text-[14px]">
+                No tickets found matching the selected filter criteria.
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Rows */}
-        <div className="flex flex-col gap-[10px]">
-          {filteredTickets.length > 0 ? (
-            filteredTickets.map((ticket) => (
-              <AdminTicketRow
-                key={ticket.id}
-                ticket={ticket}
-                isSelected={selectedTicketId === ticket.id}
-                onClick={() => selectTicket(ticket.id)}
-              />
-            ))
-          ) : (
-            <div className="p-[32px] text-center text-[var(--color-mut)] text-[14px]">
-              No tickets found matching the selected filter criteria.
-            </div>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* 5. Detail Drawer */}
       <AdminTicketDrawer />

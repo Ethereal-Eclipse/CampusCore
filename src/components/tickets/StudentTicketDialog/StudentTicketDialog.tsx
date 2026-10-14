@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTickets } from "../TicketContext"
 import { StatusPill } from "../StatusPill"
 import { TicketDetails } from "../TicketDetails"
@@ -10,6 +10,18 @@ import { X } from "@/components/ui/Icons"
 export function StudentTicketDialog() {
   const { selectedTicket, selectTicket, postTicketUpdate } = useTickets()
   const [comment, setComment] = useState("")
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.code === "Escape") {
+        e.preventDefault()
+        e.stopPropagation()
+        selectTicket(null)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown, { capture: true })
+    return () => window.removeEventListener("keydown", handleKeyDown, { capture: true })
+  }, [selectTicket])
 
   if (!selectedTicket) return null
 

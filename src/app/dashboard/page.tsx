@@ -23,45 +23,85 @@ export const instant = false
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
+  const isAdmin = session?.user?.role === "admin"
 
-  const stats = [
-    {
-      icon: Ticket,
-      iconColor: "text-[#e11d48]",
-      value: "3",
-      label: "Open Tickets",
-      cardGradient:
-        "bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] to-95%",
-      href: "/dashboard/tickets",
-    },
-    {
-      icon: Book,
-      iconColor: "text-[#2563eb]",
-      value: "24",
-      label: "Resources",
-      cardGradient:
-        "bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] to-95%",
-      href: "/dashboard/vault",
-    },
-    {
-      icon: Cart,
-      iconColor: "text-[#16a34a]",
-      value: "5",
-      label: "My Listings",
-      cardGradient:
-        "bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] to-95%",
-      href: "/dashboard/marketplace",
-    },
-    {
-      icon: Cal,
-      iconColor: "text-[#9333ea]",
-      value: "4",
-      label: "Upcoming Events",
-      cardGradient:
-        "bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] to-95%",
-      href: "/dashboard/calendar",
-    },
-  ]
+  const stats = isAdmin
+    ? [
+        {
+          icon: Ticket,
+          iconColor: "text-[#e11d48]",
+          value: "6",
+          label: "Open Grievances",
+          cardGradient:
+            "bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] to-95%",
+          href: "/dashboard/tickets",
+        },
+        {
+          icon: Book,
+          iconColor: "text-[#2563eb]",
+          value: "2",
+          label: "Flagged Notes",
+          cardGradient:
+            "bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] to-95%",
+          href: "/dashboard/vault",
+        },
+        {
+          icon: Cart,
+          iconColor: "text-[#16a34a]",
+          value: "1",
+          label: "Flagged Seller",
+          cardGradient:
+            "bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] to-95%",
+          href: "/dashboard/marketplace",
+        },
+        {
+          icon: Cal,
+          iconColor: "text-[#9333ea]",
+          value: "5",
+          label: "Active Staff Desks",
+          cardGradient:
+            "bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] to-95%",
+          href: "/dashboard/tickets",
+        },
+      ]
+    : [
+        {
+          icon: Ticket,
+          iconColor: "text-[#e11d48]",
+          value: "3",
+          label: "Open Tickets",
+          cardGradient:
+            "bg-gradient-to-br from-[var(--color-rd)] to-[var(--color-card-ref)] to-95%",
+          href: "/dashboard/tickets",
+        },
+        {
+          icon: Book,
+          iconColor: "text-[#2563eb]",
+          value: "24",
+          label: "Resources",
+          cardGradient:
+            "bg-gradient-to-br from-[var(--color-bu)] to-[var(--color-card-ref)] to-95%",
+          href: "/dashboard/vault",
+        },
+        {
+          icon: Cart,
+          iconColor: "text-[#16a34a]",
+          value: "5",
+          label: "My Listings",
+          cardGradient:
+            "bg-gradient-to-br from-[var(--color-gn)] to-[var(--color-card-ref)] to-95%",
+          href: "/dashboard/marketplace",
+        },
+        {
+          icon: Cal,
+          iconColor: "text-[#9333ea]",
+          value: "4",
+          label: "Upcoming Events",
+          cardGradient:
+            "bg-gradient-to-br from-[var(--color-pu)] to-[var(--color-card-ref)] to-95%",
+          href: "/dashboard/calendar",
+        },
+      ]
 
   return (
     <>
@@ -71,7 +111,9 @@ export default async function DashboardPage() {
             Good morning {session?.user?.name?.split(" ")[0]} 👋
           </h2>
           <p className="text-[var(--color-mut)]">
-            Here's what's happening around your campus.
+            {isAdmin
+              ? "Operational oversight and governance console for campus services."
+              : "Here's what's happening around your campus."}
           </p>
         </div>
         <div className="flex gap-[14px] items-center p-[9px_18px] border border-[var(--color-line)] rounded-[12px] bg-[var(--color-card-ref)] text-[14px] text-[var(--color-mut)]">

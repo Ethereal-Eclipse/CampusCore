@@ -33,7 +33,13 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   const rawParam = searchParams.get("ticket")
-  const selectedTicketId = rawParam ? (rawParam.startsWith("#") ? rawParam : `#${rawParam}`) : null
+  const urlSelectedId = rawParam ? (rawParam.startsWith("#") ? rawParam : `#${rawParam}`) : null
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(urlSelectedId)
+
+  // Sync state if URL changes externally
+  React.useEffect(() => {
+    setSelectedTicketId(urlSelectedId)
+  }, [urlSelectedId])
 
   const selectedTicket = useMemo(() => {
     if (!selectedTicketId) return null
@@ -48,6 +54,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
   const selectTicket = useCallback(
     (id: string | null) => {
+      setSelectedTicketId(id)
       const params = new URLSearchParams(searchParams.toString())
       if (id) {
         params.set("ticket", id.replace(/^#/, ""))
@@ -64,15 +71,22 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     setTickets((prev) =>
       prev.map((t) => {
         if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) return t
+        // Auto-escalation math: unresolved ticket over 48h must remain/turn back escalated
+        const effectiveStatus: TicketStatus =
+          newStatus !== "resolved" && t.ageHours > 48 ? "escalated" : newStatus
+
         const updateEntry: TicketUpdate = {
           id: `u-${Date.now()}`,
-          message: `Status changed to ${newStatus.replace("_", " ")}`,
+          message:
+            effectiveStatus === "escalated" && newStatus !== "escalated"
+              ? `Status reset to ${newStatus.replace("_", " ")}, but automatically flagged as escalated due to SLA policy (>48h)`
+              : `Status changed to ${effectiveStatus.replace("_", " ")}`,
           timestamp: "Just now",
-          type: newStatus,
+          type: effectiveStatus,
         }
         return {
           ...t,
-          status: newStatus,
+          status: effectiveStatus,
           updates: [...t.updates, updateEntry],
         }
       })
@@ -91,10 +105,20 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           timestamp: "Just now",
           type: "assigned",
         }
+
+        let nextStatus = t.status
+        if (!staffMember && t.status === "in_progress") {
+          nextStatus = t.ageHours > 48 ? "escalated" : "pending"
+        } else if (t.status === "pending" && staffMember) {
+          nextStatus = t.ageHours > 48 ? "escalated" : "in_progress"
+        } else if (t.ageHours > 48 && t.status !== "resolved") {
+          nextStatus = "escalated"
+        }
+
         return {
           ...t,
           assignedTo: staffMember,
-          status: t.status === "pending" && staffMember ? "in_progress" : t.status,
+          status: nextStatus,
           updates: [...t.updates, updateEntry],
         }
       })
@@ -150,15 +174,22 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     setTickets((prev) =>
       prev.map((t) => {
         if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) return t
+        const defaultAssignee =
+          t.assignedTo ||
+          mockStaff.find(
+            (s) => s.department.toLowerCase() === t.department.toLowerCase()
+          ) ||
+          mockStaff[0]
         const updateEntry: TicketUpdate = {
           id: `u-${Date.now()}`,
-          message: "Escalation acknowledged and dispatched",
+          message: `Escalation acknowledged and dispatched to ${defaultAssignee.name}`,
           timestamp: "Just now",
           type: "in_progress",
         }
         return {
           ...t,
           status: "in_progress",
+          assignedTo: defaultAssignee,
           updates: [...t.updates, updateEntry],
         }
       })

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTickets } from "../TicketContext"
 import { X } from "@/components/ui/Icons"
 
@@ -16,6 +16,19 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
   const [category, setCategory] = useState("IT and network")
   const [description, setDescription] = useState("")
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.code === "Escape") {
+        e.preventDefault()
+        e.stopPropagation()
+        onClose()
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown, { capture: true })
+    return () => window.removeEventListener("keydown", handleKeyDown, { capture: true })
+  }, [isOpen, onClose])
 
   if (!isOpen) return null
 

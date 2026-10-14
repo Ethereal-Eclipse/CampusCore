@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useTickets } from "../TicketContext"
 import { TicketStatus } from "../types"
 import { StatusPill } from "../StatusPill"
 import { TicketDetails } from "../TicketDetails"
 import { TicketTimeline } from "../TicketTimeline"
 import { X, AlertTriangle } from "@/components/ui/Icons"
+import { isTicketEscalated } from "../sla"
 
 export function AdminTicketDrawer() {
   const {
@@ -23,11 +24,25 @@ export function AdminTicketDrawer() {
   const [updateMessage, setUpdateMessage] = useState("")
   const [postError, setPostError] = useState("")
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.code === "Escape") {
+        e.preventDefault()
+        e.stopPropagation()
+        selectTicket(null)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown, { capture: true })
+    return () => window.removeEventListener("keydown", handleKeyDown, { capture: true })
+  }, [selectTicket])
+
   const sortedStaff = useMemo(() => {
     if (!selectedTicket) return staff
     return [...staff].sort((a, b) => {
-      const aMatches = a.department.toLowerCase() === selectedTicket.department.toLowerCase()
-      const bMatches = b.department.toLowerCase() === selectedTicket.department.toLowerCase()
+      const aMatches =
+        a.department.toLowerCase() === selectedTicket.department.toLowerCase()
+      const bMatches =
+        b.department.toLowerCase() === selectedTicket.department.toLowerCase()
       if (aMatches && !bMatches) return -1
       if (!aMatches && bMatches) return 1
       return a.name.localeCompare(b.name)
@@ -71,7 +86,7 @@ export function AdminTicketDrawer() {
       aria-modal="true"
     >
       <div
-        className="w-full max-w-[520px] h-full flex flex-col bg-[var(--color-card-ref)] border-l border-[var(--color-line)] shadow-2xl text-[var(--color-ink)] animate-in slide-in-from-right duration-200"
+        className="w-full max-w-[620px] h-full flex flex-col bg-[var(--color-card-ref)] border-l border-[var(--color-line)] shadow-2xl text-[var(--color-ink)] animate-in slide-in-from-right duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 1. Header: Ticket #id, title, status pill, close button */}
@@ -101,8 +116,8 @@ export function AdminTicketDrawer() {
 
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-[20px_24px] flex flex-col gap-[18px]">
-          {/* 2. Escalation notice (only when status is escalated) */}
-          {selectedTicket.status === "escalated" && (
+          {/* 2. Escalation notice (when ticket is escalated or SLA breached) */}
+          {isTicketEscalated(selectedTicket) && (
             <div className="p-[14px_16px] rounded-[12px] bg-red-500/10 border border-red-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-[12px] text-red-400">
               <div className="flex items-center gap-[10px]">
                 <AlertTriangle className="w-[20px] h-[20px] shrink-0" />
