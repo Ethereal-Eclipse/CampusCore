@@ -82,7 +82,7 @@ export function AdminCalendarView() {
   return (
     <div className="flex flex-col gap-[24px]">
       {/* Header */}
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[24px_28px] shadow-[var(--shadow-sh)] flex flex-col md:flex-row md:items-center justify-between gap-[16px]">
+      <header className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[24px_28px] shadow-[var(--shadow-sh)] flex flex-col md:flex-row md:items-center justify-between gap-[16px]">
         <div>
           <div className="flex items-center gap-[10px] mb-[6px]">
             <span className="w-[32px] h-[32px] rounded-[10px] bg-purple-600/10 text-purple-400 grid place-items-center">
@@ -100,7 +100,7 @@ export function AdminCalendarView() {
         <span className="px-[12px] py-[6px] rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[12px] font-semibold self-start md:self-auto">
           Scheduling Authority
         </span>
-      </div>
+      </header>
 
       {successMsg && (
         <div className="p-[12px_16px] rounded-[12px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[13px] flex items-center gap-[8px]">
@@ -110,37 +110,37 @@ export function AdminCalendarView() {
       )}
 
       {/* Metric Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+      <section aria-label="Calendar metrics" className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Published Events
           </span>
           <span className="text-[26px] font-bold text-[var(--color-ink)]">{events.length}</span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Exam Schedules
           </span>
           <span className="text-[26px] font-bold text-purple-400">2 Active</span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Venue Bookings
           </span>
           <span className="text-[26px] font-bold text-blue-400">4 Venues</span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Auditorium 1
           </span>
           <span className="text-[26px] font-bold text-amber-400">Reserved</span>
-        </div>
-      </div>
+        </article>
+      </section>
 
       {/* Main Grid: Publish Form and Venue Timetable */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
         {/* Publish form */}
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
           <div className="flex items-center gap-[10px] mb-[16px]">
             <Plus className="w-[18px] h-[18px] text-purple-400" />
             <h2 className="text-[16px] font-bold text-[var(--color-ink)]">
@@ -236,10 +236,10 @@ export function AdminCalendarView() {
               Publish Event to Schedule
             </button>
           </form>
-        </div>
+        </article>
 
         {/* Timetable Schedule */}
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)] flex flex-col justify-between">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-[16px]">
               <div className="flex items-center gap-[10px]">
@@ -255,7 +255,7 @@ export function AdminCalendarView() {
 
             <div className="flex flex-col gap-[10px]">
               {events.map((ev) => (
-                <div
+                <article
                   key={ev.id}
                   className="p-[14px] rounded-[12px] bg-[var(--color-bg)] border border-[var(--color-line)] flex items-center justify-between gap-[14px]"
                 >
@@ -288,12 +288,12 @@ export function AdminCalendarView() {
                   >
                     Cancel
                   </button>
-                </div>
+                </article>
               ))}
             </div>
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
     </div>
   )
 }

@@ -82,7 +82,7 @@ export function AdminLostFoundView() {
   return (
     <div className="flex flex-col gap-[24px]">
       {/* Header */}
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[24px_28px] shadow-[var(--shadow-sh)] flex flex-col md:flex-row md:items-center justify-between gap-[16px]">
+      <header className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[24px_28px] shadow-[var(--shadow-sh)] flex flex-col md:flex-row md:items-center justify-between gap-[16px]">
         <div>
           <div className="flex items-center gap-[10px] mb-[6px]">
             <span className="w-[32px] h-[32px] rounded-[10px] bg-amber-500/10 text-amber-500 grid place-items-center">
@@ -100,7 +100,7 @@ export function AdminLostFoundView() {
         <span className="px-[12px] py-[6px] rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[12px] font-semibold self-start md:self-auto">
           Campus Custody Desk
         </span>
-      </div>
+      </header>
 
       {toastMsg && (
         <div className="p-[12px_16px] rounded-[12px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[13px] flex items-center gap-[8px]">
@@ -110,41 +110,41 @@ export function AdminLostFoundView() {
       )}
 
       {/* Metric Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+      <section aria-label="Custody metrics" className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Items in Custody
           </span>
           <span className="text-[26px] font-bold text-amber-400">
             {items.filter((i) => i.status === "In Custody").length}
           </span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Returned to Owner
           </span>
           <span className="text-[26px] font-bold text-emerald-400">
             {items.filter((i) => i.status === "Claimed").length}
           </span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Security Desks
           </span>
           <span className="text-[26px] font-bold text-[var(--color-ink)]">3 Gates</span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Recovery Rate
           </span>
           <span className="text-[26px] font-bold text-blue-400">89%</span>
-        </div>
-      </div>
+        </article>
+      </section>
 
       {/* Main Grid: Log Turn-in and Custody Items */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
         {/* Register Turn-in Form */}
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
           <div className="flex items-center gap-[10px] mb-[16px]">
             <Plus className="w-[18px] h-[18px] text-amber-500" />
             <h2 className="text-[16px] font-bold text-[var(--color-ink)]">
@@ -204,10 +204,10 @@ export function AdminLostFoundView() {
               Add to Custody Register
             </button>
           </form>
-        </div>
+        </article>
 
         {/* Custody Inventory */}
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)] flex flex-col justify-between">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-[16px]">
               <h2 className="text-[16px] font-bold text-[var(--color-ink)]">
@@ -220,7 +220,7 @@ export function AdminLostFoundView() {
 
             <div className="flex flex-col gap-[10px]">
               {items.map((item) => (
-                <div
+                <article
                   key={item.id}
                   className="p-[14px] rounded-[12px] bg-[var(--color-bg)] border border-[var(--color-line)] flex items-center justify-between gap-[14px]"
                 >
@@ -261,12 +261,12 @@ export function AdminLostFoundView() {
                       Verify Claim
                     </button>
                   )}
-                </div>
+                </article>
               ))}
             </div>
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
     </div>
   )
 }

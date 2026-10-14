@@ -85,12 +85,13 @@ export function AdminTicketDrawer() {
       role="dialog"
       aria-modal="true"
     >
-      <div
+      <aside
+        aria-label="Ticket details drawer"
         className="w-full max-w-[620px] h-full flex flex-col bg-[var(--color-card-ref)] border-l border-[var(--color-line)] shadow-2xl text-[var(--color-ink)] animate-in slide-in-from-right duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 1. Header: Ticket #id, title, status pill, close button */}
-        <div className="p-[20px_24px] border-b border-[var(--color-line)] shrink-0">
+        <header className="p-[20px_24px] border-b border-[var(--color-line)] shrink-0">
           <div className="flex items-center justify-between gap-[12px] mb-[6px]">
             <span className="text-[13px] font-medium text-[var(--color-mut)]">
               Ticket {selectedTicket.id}
@@ -112,7 +113,7 @@ export function AdminTicketDrawer() {
           <h3 className="text-[20px] font-bold text-[var(--color-ink)] leading-snug">
             {selectedTicket.title}
           </h3>
-        </div>
+        </header>
 
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-[20px_24px] flex flex-col gap-[18px]">
@@ -291,7 +292,7 @@ export function AdminTicketDrawer() {
             </button>
           </div>
         </div>
-      </div>
+      </aside>
     </div>
   )
 }

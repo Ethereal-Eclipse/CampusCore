@@ -43,11 +43,11 @@ export default async function MarketplacePage() {
         actionButtonText="+ Sell Item"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
+      <section aria-label="Marketplace listings catalog" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
         {dummyItems.map((item, i) => (
           <ProductCard key={i} item={item} />
         ))}
-      </div>
+      </section>
     </div>
   )
 }

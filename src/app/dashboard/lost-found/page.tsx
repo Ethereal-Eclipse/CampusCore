@@ -40,11 +40,11 @@ export default async function LostFoundPage() {
         actionButtonText="+ Report Item"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+      <section aria-label="Lost and found items catalog" className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
         {dummyItems.map((item, i) => (
           <LostFoundCard key={i} item={item} />
         ))}
-      </div>
+      </section>
     </div>
   )
 }

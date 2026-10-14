@@ -60,7 +60,7 @@ export function AdminMarketplaceView() {
   return (
     <div className="flex flex-col gap-[24px]">
       {/* Header */}
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[24px_28px] shadow-[var(--shadow-sh)] flex flex-col md:flex-row md:items-center justify-between gap-[16px]">
+      <header className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[24px_28px] shadow-[var(--shadow-sh)] flex flex-col md:flex-row md:items-center justify-between gap-[16px]">
         <div>
           <div className="flex items-center gap-[10px] mb-[6px]">
             <span className="w-[32px] h-[32px] rounded-[10px] bg-emerald-600/10 text-emerald-500 grid place-items-center">
@@ -78,7 +78,7 @@ export function AdminMarketplaceView() {
         <span className="px-[12px] py-[6px] rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[12px] font-semibold self-start md:self-auto">
           Trust &amp; Safety Admin
         </span>
-      </div>
+      </header>
 
       {toastMessage && (
         <div className="p-[12px_16px] rounded-[12px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[13px] flex items-center gap-[8px]">
@@ -88,37 +88,37 @@ export function AdminMarketplaceView() {
       )}
 
       {/* Metric Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+      <section aria-label="Marketplace metrics" className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Active Listings
           </span>
           <span className="text-[26px] font-bold text-[var(--color-ink)]">38</span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Reported Items
           </span>
           <span className="text-[26px] font-bold text-red-400">
             {reports.length}
           </span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Resolved Flags
           </span>
           <span className="text-[26px] font-bold text-emerald-400">14</span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Trade Volume
           </span>
           <span className="text-[26px] font-bold text-[var(--color-ink)]">₹24,800</span>
-        </div>
-      </div>
+        </article>
+      </section>
 
       {/* Reported Sellers Section */}
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+      <section aria-label="Reported sellers and disputes" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
         <div className="flex items-center justify-between mb-[16px]">
           <div className="flex items-center gap-[10px]">
             <AlertTriangle className="w-[18px] h-[18px] text-red-400" />
@@ -138,7 +138,7 @@ export function AdminMarketplaceView() {
         ) : (
           <div className="flex flex-col gap-[12px]">
             {reports.map((item) => (
-              <div
+              <article
                 key={item.id}
                 className="p-[16px] rounded-[14px] bg-[var(--color-bg)] border border-[var(--color-line)] flex flex-col sm:flex-row sm:items-center justify-between gap-[16px]"
               >
@@ -186,11 +186,11 @@ export function AdminMarketplaceView() {
                     Suspend Seller
                   </button>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         )}
-      </div>
+      </section>
     </div>
   )
 }

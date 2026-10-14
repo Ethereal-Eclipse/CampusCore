@@ -58,11 +58,11 @@ export default async function VaultPage() {
         </div>
       </ModuleHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
+      <section aria-label="Academic resources catalog" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
         {dummyResources.map((res, i) => (
           <ResourceCard key={i} resource={res} />
         ))}
-      </div>
+      </section>
     </div>
   )
 }

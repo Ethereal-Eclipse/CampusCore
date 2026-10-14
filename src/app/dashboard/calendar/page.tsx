@@ -44,7 +44,7 @@ export default async function CalendarPage() {
         actionButtonText="+ Add Event"
       />
 
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+      <section aria-label="Today's schedule" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
         <h3 className="font-bold text-[18px] mb-[16px] flex items-center gap-2 text-[var(--color-ink)]">
           <Cal className="w-5 h-5 text-[var(--color-navy)]" /> Today's Schedule
         </h3>
@@ -53,7 +53,7 @@ export default async function CalendarPage() {
             <EventCard key={i} event={ev} />
           ))}
         </div>
-      </div>
+      </section>
     </div>
   )
 }

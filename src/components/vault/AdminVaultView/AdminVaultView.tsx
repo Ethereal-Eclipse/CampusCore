@@ -68,7 +68,7 @@ export function AdminVaultView() {
   return (
     <div className="flex flex-col gap-[24px]">
       {/* Admin Header */}
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[24px_28px] shadow-[var(--shadow-sh)] flex flex-col md:flex-row md:items-center justify-between gap-[16px]">
+      <header className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[24px_28px] shadow-[var(--shadow-sh)] flex flex-col md:flex-row md:items-center justify-between gap-[16px]">
         <div>
           <div className="flex items-center gap-[10px] mb-[6px]">
             <span className="w-[32px] h-[32px] rounded-[10px] bg-blue-600/10 text-blue-500 grid place-items-center">
@@ -86,42 +86,42 @@ export function AdminVaultView() {
         <span className="px-[12px] py-[6px] rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[12px] font-semibold self-start md:self-auto">
           Admin Access
         </span>
-      </div>
+      </header>
 
       {/* Metric Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+      <section aria-label="Vault metrics" className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Verified Documents
           </span>
           <span className="text-[26px] font-bold text-[var(--color-ink)]">48</span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Flagged for Review
           </span>
           <span className="text-[26px] font-bold text-red-400">
             {flaggedItems.length}
           </span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Pending Submissions
           </span>
           <span className="text-[26px] font-bold text-amber-400">5</span>
-        </div>
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
+        </article>
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Cloudflare R2 Storage
           </span>
           <span className="text-[26px] font-bold text-[var(--color-ink)]">342 MB</span>
-        </div>
-      </div>
+        </article>
+      </section>
 
       {/* Main Grid: Upload card & Flagged items moderation */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
         {/* Upload Form */}
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
           <div className="flex items-center gap-[10px] mb-[16px]">
             <Upload className="w-[18px] h-[18px] text-blue-500" />
             <h2 className="text-[16px] font-bold text-[var(--color-ink)]">
@@ -212,10 +212,10 @@ export function AdminVaultView() {
               Publish Verified Material
             </button>
           </form>
-        </div>
+        </article>
 
         {/* Moderation Queue */}
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)] flex flex-col justify-between">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-[14px]">
               <div className="flex items-center gap-[10px]">
@@ -236,7 +236,7 @@ export function AdminVaultView() {
             ) : (
               <div className="flex flex-col gap-[12px]">
                 {flaggedItems.map((item) => (
-                  <div
+                  <article
                     key={item.id}
                     className="p-[14px] rounded-[12px] bg-[var(--color-bg)] border border-[var(--color-line)] flex flex-col gap-[8px]"
                   >
@@ -274,13 +274,13 @@ export function AdminVaultView() {
                         Remove Document
                       </button>
                     </div>
-                  </div>
+                  </article>
                 ))}
               </div>
             )}
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
     </div>
   )
 }

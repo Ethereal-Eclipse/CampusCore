@@ -111,12 +111,12 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
       role="dialog"
       aria-modal="true"
     >
-      <div
+      <article
         className="w-full max-w-[540px] max-h-[92vh] flex flex-col bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] shadow-2xl text-[var(--color-ink)] animate-in zoom-in-95 duration-150 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-[20px_24px] border-b border-[var(--color-line)] flex items-center justify-between shrink-0">
+        <header className="p-[20px_24px] border-b border-[var(--color-line)] flex items-center justify-between shrink-0">
           <div>
             <h3 className="text-[18px] font-bold text-[var(--color-ink)] leading-snug">
               Raise Campus Grievance
@@ -133,7 +133,7 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
           >
             <X className="w-[18px] h-[18px]" />
           </button>
-        </div>
+        </header>
 
         {/* Form Body (Scrollable) */}
         <div className="p-[20px_24px] overflow-y-auto flex-1 flex flex-col gap-[16px]">
@@ -323,7 +323,7 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
         </div>
 
         {/* Modal Footer */}
-        <div className="p-[16px_24px] border-t border-[var(--color-line)] flex items-center justify-end gap-[10px] shrink-0 bg-[var(--color-card-ref)]">
+        <footer className="p-[16px_24px] border-t border-[var(--color-line)] flex items-center justify-end gap-[10px] shrink-0 bg-[var(--color-card-ref)]">
           <button
             type="button"
             onClick={onClose}
@@ -338,8 +338,8 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
           >
             Submit Grievance
           </button>
-        </div>
-      </div>
+        </footer>
+      </article>
     </div>
   )
 }

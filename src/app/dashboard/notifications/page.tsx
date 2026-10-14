@@ -43,13 +43,13 @@ export default async function NotificationsPage() {
         actionButtonText="Mark all as read"
       />
 
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+      <section aria-label="Notifications list" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
         <div className="flex flex-col gap-[14px]">
           {dummyNotifs.map((notif, i) => (
             <NotificationItem key={i} notification={notif} />
           ))}
         </div>
-      </div>
+      </section>
     </div>
   )
 }

@@ -46,7 +46,7 @@ export default async function DashboardLayout({
       </aside>
 
       <main className="min-w-0">
-        <div className="h-[64px] border-b border-[var(--color-line)] bg-[var(--color-card-ref)] flex items-center gap-[14px] px-[16px] md:px-[28px]">
+        <header className="h-[64px] border-b border-[var(--color-line)] bg-[var(--color-card-ref)] flex items-center gap-[14px] px-[16px] md:px-[28px]">
           <label className="flex items-center gap-[10px] flex-1 max-w-[450px] p-[10px_16px] rounded-full bg-[var(--color-bg)] text-[var(--color-mut)] text-[14px]">
             <Search className="w-[18px] h-[18px]" />
             <input
@@ -88,7 +88,7 @@ export default async function DashboardLayout({
               </small>
             </div>
           </Link>
-        </div>
+        </header>
         <div className="max-w-[1180px] mx-auto p-[20px_16px] md:p-[32px_32px_48px] grid gap-[26px]">
           {children}
         </div>

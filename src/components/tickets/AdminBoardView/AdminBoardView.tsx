@@ -86,7 +86,7 @@ export function AdminBoardView() {
       {/* 3 Columns: Pending, In progress, Resolved */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[18px]">
         {/* Column 1: Pending */}
-        <div className="flex flex-col gap-[12px]">
+        <section aria-label="Pending tickets column" className="flex flex-col gap-[12px]">
           <div className="flex items-center justify-between px-[4px]">
             <span className="px-[10px] py-[3px] rounded-full bg-amber-400/10 text-amber-400 text-[12px] font-semibold">
               Pending
@@ -107,10 +107,10 @@ export function AdminBoardView() {
               />
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Column 2: In progress */}
-        <div className="flex flex-col gap-[12px]">
+        <section aria-label="In progress tickets column" className="flex flex-col gap-[12px]">
           <div className="flex items-center justify-between px-[4px]">
             <span className="px-[10px] py-[3px] rounded-full bg-blue-400/10 text-blue-400 text-[12px] font-semibold">
               In progress
@@ -131,10 +131,10 @@ export function AdminBoardView() {
               />
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Column 3: Resolved */}
-        <div className="flex flex-col gap-[12px]">
+        <section aria-label="Resolved tickets column" className="flex flex-col gap-[12px]">
           <div className="flex items-center justify-between px-[4px]">
             <span className="px-[10px] py-[3px] rounded-full bg-emerald-400/10 text-emerald-400 text-[12px] font-semibold">
               Resolved
@@ -155,7 +155,7 @@ export function AdminBoardView() {
               />
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   )
@@ -177,7 +177,7 @@ function BoardCard({
   const isResolved = slaInfo.isResolved
 
   return (
-    <div
+    <article
       onClick={onSelect}
       role="button"
       tabIndex={0}
@@ -253,6 +253,6 @@ function BoardCard({
           Mark resolved
         </button>
       )}
-    </div>
+    </article>
   )
 }

@@ -23,7 +23,7 @@ export function AdminTicketRow({
   const isOverdue = slaInfo.isOverdue
 
   return (
-    <div
+    <article
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -114,6 +114,6 @@ export function AdminTicketRow({
           <StatusPill status={isEscalated ? "escalated" : ticket.status} />
         </div>
       </div>
-    </div>
+    </article>
   )
 }

@@ -43,12 +43,12 @@ export function StudentTicketDialog() {
       role="dialog"
       aria-modal="true"
     >
-      <div
+      <article
         className="w-full max-w-[470px] max-h-[90vh] overflow-y-auto bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[20px] p-[28px] shadow-2xl text-[var(--color-ink)] animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="flex items-center justify-between gap-[12px] mb-[6px]">
+        <header className="flex items-center justify-between gap-[12px] mb-[6px]">
           <span className="text-[13px] font-medium text-[var(--color-mut)]">
             Ticket {selectedTicket.id}
           </span>
@@ -64,7 +64,7 @@ export function StudentTicketDialog() {
               <X className="w-[16px] h-[16px]" />
             </button>
           </div>
-        </div>
+        </header>
 
         {/* Large Title */}
         <h3 className="text-[20px] font-bold text-[var(--color-ink)] mb-[10px] leading-snug">
@@ -109,7 +109,7 @@ export function StudentTicketDialog() {
             Send
           </button>
         </form>
-      </div>
+      </article>
     </div>
   )
 }

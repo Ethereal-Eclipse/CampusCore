@@ -14,7 +14,7 @@ export function StudentGrievanceDesk() {
   return (
     <div className="flex flex-col gap-[20px]">
       {/* Header matching Image 3 */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-[16px] bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[24px_28px] shadow-[var(--shadow-sh)]">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-[16px] bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[24px_28px] shadow-[var(--shadow-sh)]">
         <div>
           <h1 className="text-[24px] font-bold text-[var(--color-ink)] tracking-tight">
             Grievance desk
@@ -32,10 +32,10 @@ export function StudentGrievanceDesk() {
           <Plus className="w-[16px] h-[16px]" />
           Raise issue
         </button>
-      </div>
+      </header>
 
       {/* Ticket Rows list matching Image 3 */}
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)]">
+      <section aria-label="Campus grievances list" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)]">
         <div className="flex flex-col gap-[12px]">
           {tickets.map((ticket) => (
             <StudentTicketRow
@@ -45,7 +45,7 @@ export function StudentGrievanceDesk() {
             />
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Detail Pop-up (Image 2) */}
       <StudentTicketDialog />

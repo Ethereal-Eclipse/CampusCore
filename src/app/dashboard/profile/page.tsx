@@ -15,7 +15,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-[20px]">
-      <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[32px] shadow-[var(--shadow-sh)] flex flex-col sm:flex-row gap-[24px] items-center sm:items-start text-center sm:text-left">
+      <header className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[32px] shadow-[var(--shadow-sh)] flex flex-col sm:flex-row gap-[24px] items-center sm:items-start text-center sm:text-left">
         {image ? (
           <img
             src={image}
@@ -46,10 +46,10 @@ export default async function ProfilePage() {
             </span>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+      <section aria-label="Profile metrics and activity" className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
           <h3 className="font-bold text-[18px] mb-[16px] text-[var(--color-navy)]">
             Academic Stats
           </h3>
@@ -71,9 +71,9 @@ export default async function ProfilePage() {
               <span className="font-semibold">-</span>
             </li>
           </ul>
-        </div>
+        </article>
 
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+        <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
           <h3 className="font-bold text-[18px] mb-[16px] text-[var(--color-navy)]">
             Recent Activity
           </h3>
@@ -82,8 +82,8 @@ export default async function ProfilePage() {
               No recent activity recorded yet.
             </p>
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
     </div>
   )
 }

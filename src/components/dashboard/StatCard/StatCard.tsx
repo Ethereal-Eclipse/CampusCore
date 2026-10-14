@@ -8,6 +8,8 @@ interface StatCardProps {
   value: string | number
   label: string
   subtext?: string
+  actionText?: string
+  actionColor?: string
   badge?: {
     text: string
     variant?: "danger" | "success" | "warning" | "info" | "purple"
@@ -22,6 +24,8 @@ export function StatCard({
   value,
   label,
   subtext,
+  actionText,
+  actionColor,
   badge,
   cardGradient,
 }: StatCardProps) {
@@ -48,7 +52,7 @@ export function StatCard({
   }
 
   return (
-    <div
+    <article
       className={`rounded-[18px] p-[22px] border border-[var(--color-line)] shadow-[var(--shadow-sh)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(30,58,138,0.08)] cursor-pointer group flex flex-col justify-between ${
         cardGradient
           ? cardGradient
@@ -84,6 +88,15 @@ export function StatCard({
           {subtext}
         </div>
       )}
-    </div>
+      {actionText && (
+        <div
+          className={`text-[12px] font-medium flex items-center justify-end gap-[4px] mt-[10px] transition-transform duration-150 group-hover:translate-x-[2px] ${
+            actionColor || iconColor || "text-[var(--color-mut)]"
+          }`}
+        >
+          <span>{actionText}</span>
+        </div>
+      )}
+    </article>
   )
 }

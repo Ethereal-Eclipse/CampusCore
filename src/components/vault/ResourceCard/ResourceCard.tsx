@@ -37,7 +37,7 @@ export function ResourceCard({
     "bg-[#e8f1ff] text-[#3b82f6]"
 
   return (
-    <div
+    <article
       onClick={onClick}
       className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)] flex flex-col justify-between transition-all duration-200 hover:shadow-[0_14px_34px_rgba(30,58,138,0.1)] hover:-translate-y-[2px] hover:border-[var(--color-navy)]/30 cursor-pointer group"
     >
@@ -80,6 +80,6 @@ export function ResourceCard({
           Download
         </button>
       </div>
-    </div>
+    </article>
   )
 }

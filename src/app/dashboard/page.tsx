@@ -30,6 +30,7 @@ export default async function DashboardPage() {
         {
           icon: Ticket,
           iconColor: "text-[#e11d48]",
+          actionColor: "text-[#e11d48]",
           value: "6",
           label: "Open Grievances",
           cardGradient:
@@ -39,6 +40,7 @@ export default async function DashboardPage() {
         {
           icon: Book,
           iconColor: "text-[#2563eb]",
+          actionColor: "text-[#2563eb]",
           value: "2",
           label: "Flagged Notes",
           cardGradient:
@@ -48,6 +50,7 @@ export default async function DashboardPage() {
         {
           icon: Cart,
           iconColor: "text-[#16a34a]",
+          actionColor: "text-[#16a34a]",
           value: "1",
           label: "Flagged Seller",
           cardGradient:
@@ -57,6 +60,7 @@ export default async function DashboardPage() {
         {
           icon: Cal,
           iconColor: "text-[#9333ea]",
+          actionColor: "text-[#9333ea]",
           value: "5",
           label: "Active Staff Desks",
           cardGradient:
@@ -68,6 +72,7 @@ export default async function DashboardPage() {
         {
           icon: Ticket,
           iconColor: "text-[#e11d48]",
+          actionColor: "text-[#e11d48]",
           value: "3",
           label: "Open Tickets",
           cardGradient:
@@ -77,6 +82,7 @@ export default async function DashboardPage() {
         {
           icon: Book,
           iconColor: "text-[#2563eb]",
+          actionColor: "text-[#2563eb]",
           value: "24",
           label: "Resources",
           cardGradient:
@@ -86,6 +92,7 @@ export default async function DashboardPage() {
         {
           icon: Cart,
           iconColor: "text-[#16a34a]",
+          actionColor: "text-[#16a34a]",
           value: "5",
           label: "My Listings",
           cardGradient:
@@ -95,6 +102,7 @@ export default async function DashboardPage() {
         {
           icon: Cal,
           iconColor: "text-[#9333ea]",
+          actionColor: "text-[#9333ea]",
           value: "4",
           label: "Upcoming Events",
           cardGradient:
@@ -105,7 +113,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <div className="flex justify-between items-start gap-[16px] flex-wrap">
+      <header className="flex justify-between items-start gap-[16px] flex-wrap">
         <div>
           <h2 className="text-[32px] tracking-[-0.5px] text-[var(--color-navy)] font-bold">
             {isAdmin
@@ -132,22 +140,23 @@ export default async function DashboardPage() {
           ⛅ <b className="text-[var(--color-ink)] font-medium">28°C</b> Partly
           Cloudy
         </div>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+      <section aria-label="Key campus statistics" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
         {stats.map((st) => (
           <Link key={st.label} href={st.href} className="block group">
             <StatCard
               icon={st.icon}
               iconColor={st.iconColor}
+              actionColor={st.actionColor}
               value={st.value}
               label={st.label}
               cardGradient={st.cardGradient}
-              subtext="Click to view details →"
+              actionText="View all →"
             />
           </Link>
         ))}
-      </div>
+      </section>
 
       <section className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
         <h3 className="text-[17px] flex justify-between items-center mb-[14px] font-semibold">

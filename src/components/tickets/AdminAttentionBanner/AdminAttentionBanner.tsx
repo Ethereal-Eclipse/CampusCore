@@ -16,7 +16,8 @@ export function AdminAttentionBanner({
   className = "",
 }: AdminAttentionBannerProps) {
   return (
-    <div
+    <aside
+      role="alert"
       className={`flex items-center justify-between gap-[16px] p-[14px_18px] rounded-[12px] bg-red-500/10 border border-red-500/20 text-red-400 ${className}`}
     >
       <div className="flex items-center gap-[10px] min-w-0">
@@ -38,6 +39,6 @@ export function AdminAttentionBanner({
       >
         {isFilterActive ? "Clear review" : "Review"}
       </button>
-    </div>
+    </aside>
   )
 }

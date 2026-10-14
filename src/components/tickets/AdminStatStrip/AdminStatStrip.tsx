@@ -34,9 +34,9 @@ export function AdminStatStrip({ tickets, className = "" }: AdminStatStripProps)
   ]
 
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-4 gap-[14px] ${className}`}>
+    <section aria-label="Ticket statistics summary" className={`grid grid-cols-2 md:grid-cols-4 gap-[14px] ${className}`}>
       {stats.map((stat) => (
-        <div
+        <article
           key={stat.label}
           className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[18px_20px] shadow-[var(--shadow-sh)]"
         >
@@ -46,8 +46,8 @@ export function AdminStatStrip({ tickets, className = "" }: AdminStatStripProps)
           <span className={`text-[28px] font-bold leading-none ${stat.color}`}>
             {stat.value}
           </span>
-        </div>
+        </article>
       ))}
-    </div>
+    </section>
   )
 }

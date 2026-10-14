@@ -12,7 +12,7 @@ interface StudentTicketRowProps {
 
 export function StudentTicketRow({ ticket, onClick }: StudentTicketRowProps) {
   return (
-    <div
+    <article
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -47,6 +47,6 @@ export function StudentTicketRow({ ticket, onClick }: StudentTicketRowProps) {
         <StatusPill status={ticket.status} />
         <ChevronRight className="w-[18px] h-[18px] text-[var(--color-mut)] group-hover:text-[var(--color-ink)] transition-colors" />
       </div>
-    </div>
+    </article>
   )
 }

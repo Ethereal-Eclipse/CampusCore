@@ -51,7 +51,7 @@ export function TicketCard({
   onClick,
 }: TicketCardProps) {
   return (
-    <div
+    <article
       onClick={onClick}
       className={`flex flex-col md:flex-row justify-between md:items-center gap-[14px] p-[16px_20px] rounded-[14px] border transition-all duration-200 cursor-pointer hover:shadow-[0_4px_16px_rgba(30,58,138,0.06)] hover:-translate-y-[1px] group ${
         ticket.escalated
@@ -107,6 +107,6 @@ export function TicketCard({
           </button>
         )}
       </div>
-    </div>
+    </article>
   )
 }

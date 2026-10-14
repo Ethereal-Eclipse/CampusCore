@@ -85,7 +85,7 @@ export function AdminManagementList() {
       />
 
       {/* 3. Filter Row matching Image 1 */}
-      <div className="flex flex-wrap items-center justify-between gap-[12px] pt-[4px]">
+      <nav aria-label="Ticket filters" className="flex flex-wrap items-center justify-between gap-[12px] pt-[4px]">
         <div className="flex items-center gap-[10px] flex-wrap">
           {/* List / Board Pill Toggle */}
           <div className="flex items-center p-[3px] rounded-full bg-[var(--color-bg)] border border-[var(--color-line)] text-[13px] font-medium">
@@ -151,15 +151,15 @@ export function AdminManagementList() {
           <ArrowUpDown className="w-[14px] h-[14px] text-[var(--color-mut)]" />
           <span>{sortOrder === "oldest" ? "Oldest first" : "Newest first"}</span>
         </button>
-      </div>
+      </nav>
 
       {/* 4. List View or Board View */}
       {activeTab === "board" ? (
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[24px] shadow-[var(--shadow-sh)]">
+        <section aria-label="Master issue board" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[24px] shadow-[var(--shadow-sh)]">
           <AdminBoardView />
-        </div>
+        </section>
       ) : (
-        <div className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)]">
+        <section aria-label="Grievance management list" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)]">
           {/* Column Headers */}
           <div className="hidden md:flex items-center justify-between text-[12px] font-semibold text-[var(--color-mut)] px-[20px] pb-[12px] uppercase tracking-wider">
             <span className="flex-1">Issue</span>
@@ -187,7 +187,7 @@ export function AdminManagementList() {
               </div>
             )}
           </div>
-        </div>
+        </section>
       )}
 
       {/* 5. Detail Drawer */}

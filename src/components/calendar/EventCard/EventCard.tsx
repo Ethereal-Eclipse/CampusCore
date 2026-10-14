@@ -37,7 +37,7 @@ export function EventCard({ event }: EventCardProps) {
   }
 
   return (
-    <div
+    <article
       className="relative p-[16px] rounded-[14px] border border-[var(--color-line)] border-l-[4px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-[12px] overflow-hidden transition-all duration-200 hover:shadow-[0_4px_16px_rgba(30,58,138,0.06)] hover:-translate-y-[1px] hover:border-y-[var(--color-navy)]/30 hover:border-r-[var(--color-navy)]/30 cursor-pointer group"
       style={{ borderLeftColor: theme.border }}
     >
@@ -69,6 +69,6 @@ export function EventCard({ event }: EventCardProps) {
       >
         {event.type}
       </span>
-    </div>
+    </article>
   )
 }

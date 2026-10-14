@@ -18,7 +18,7 @@ export function ModuleHeader({
   children,
 }: ModuleHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-[16px] bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+    <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-[16px] bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
       <div>
         <h1 className="text-[24px] font-bold text-[var(--color-navy)] mb-[4px]">
           {title}
@@ -37,6 +37,6 @@ export function ModuleHeader({
           </button>
         )}
       </div>
-    </div>
+    </header>
   )
 }
