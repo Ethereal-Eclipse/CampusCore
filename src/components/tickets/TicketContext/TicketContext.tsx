@@ -1,15 +1,23 @@
 "use client"
 
-import React, { createContext, useContext, useState, useMemo, useCallback } from "react"
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+} from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Ticket, TicketStatus, StaffMember, TicketUpdate } from "../types"
-import { initialTickets, mockStaff } from "../mockData"
+import { mockStaff } from "../mockData"
 
 interface TicketContextType {
   tickets: Ticket[]
   staff: StaffMember[]
   selectedTicket: Ticket | null
   selectedTicketId: string | null
+  isLoading: boolean
   selectTicket: (id: string | null) => void
   updateTicketStatus: (id: string, status: TicketStatus) => void
   updateTicketAssignee: (id: string, staffMember: StaffMember | null) => void
@@ -30,17 +38,47 @@ interface TicketContextType {
 const TicketContext = createContext<TicketContextType | null>(null)
 
 export function TicketProvider({ children }: { children: React.ReactNode }) {
-  const [tickets, setTickets] = useState<Ticket[]>(initialTickets)
+  const [tickets, setTickets] = useState<Ticket[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
 
   const rawParam = searchParams.get("ticket")
-  const urlSelectedId = rawParam ? (rawParam.startsWith("#") ? rawParam : `#${rawParam}`) : null
-  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(urlSelectedId)
+  const urlSelectedId = rawParam
+    ? rawParam.startsWith("#")
+      ? rawParam
+      : `#${rawParam}`
+    : null
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(
+    urlSelectedId,
+  )
+
+  // Fetch tickets from MongoDB Atlas on mount
+  useEffect(() => {
+    let isMounted = true
+    async function loadTickets() {
+      try {
+        const res = await fetch("/api/tickets")
+        if (!res.ok) return
+        const data = await res.json()
+        if (isMounted && data.success && Array.isArray(data.tickets)) {
+          setTickets(data.tickets)
+        }
+      } catch (err) {
+        console.error("Failed to load tickets from MongoDB Atlas:", err)
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+    loadTickets()
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   // Sync state if URL changes externally
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedTicketId(urlSelectedId)
   }, [urlSelectedId])
 
@@ -50,7 +88,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       tickets.find(
         (t) =>
           t.id === selectedTicketId ||
-          t.id.replace("#", "") === selectedTicketId.replace("#", "")
+          t.id.replace("#", "") === selectedTicketId.replace("#", ""),
       ) || null
     )
   }, [tickets, selectedTicketId])
@@ -65,68 +103,112 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         params.delete("ticket")
       }
       const query = params.toString()
-      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      })
     },
-    [router, pathname, searchParams]
+    [router, pathname, searchParams],
   )
 
-  const updateTicketStatus = useCallback((id: string, newStatus: TicketStatus) => {
-    setTickets((prev) =>
-      prev.map((t) => {
-        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) return t
-        // Auto-escalation math: unresolved ticket over 48h must remain/turn back escalated
-        const effectiveStatus: TicketStatus =
-          newStatus !== "resolved" && t.ageHours > 48 ? "escalated" : newStatus
+  const updateTicketStatus = useCallback(
+    (id: string, newStatus: TicketStatus) => {
+      setTickets((prev) =>
+        prev.map((t) => {
+          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+            return t
+          // Auto-escalation math: unresolved ticket over 48h must remain/turn back escalated
+          const effectiveStatus: TicketStatus =
+            newStatus !== "resolved" && t.ageHours > 48
+              ? "escalated"
+              : newStatus
 
-        const updateEntry: TicketUpdate = {
-          id: `u-${Date.now()}`,
-          message:
-            effectiveStatus === "escalated" && newStatus !== "escalated"
-              ? `Status reset to ${newStatus.replace("_", " ")}, but automatically flagged as escalated due to SLA policy (>48h)`
-              : `Status changed to ${effectiveStatus.replace("_", " ")}`,
-          timestamp: "Just now",
-          type: effectiveStatus,
-        }
-        return {
-          ...t,
-          status: effectiveStatus,
-          updates: [...t.updates, updateEntry],
-        }
+          const updateEntry: TicketUpdate = {
+            id: `u-${Date.now()}`,
+            message:
+              effectiveStatus === "escalated" && newStatus !== "escalated"
+                ? `Status reset to ${newStatus.replace("_", " ")}, but automatically flagged as escalated due to SLA policy (>48h)`
+                : `Status changed to ${effectiveStatus.replace("_", " ")}`,
+            timestamp: "Just now",
+            type: effectiveStatus,
+          }
+          return {
+            ...t,
+            status: effectiveStatus,
+            updates: [...t.updates, updateEntry],
+          }
+        }),
+      )
+
+      // Persist status change to MongoDB
+      fetch(`/api/tickets/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
       })
-    )
-  }, [])
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.ticket) {
+            setTickets((prev) =>
+              prev.map((t) => (t.id === data.ticket.id ? data.ticket : t)),
+            )
+          }
+        })
+        .catch((err) => console.error("Error saving status to MongoDB:", err))
+    },
+    [],
+  )
 
-  const updateTicketAssignee = useCallback((id: string, staffMember: StaffMember | null) => {
-    setTickets((prev) =>
-      prev.map((t) => {
-        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) return t
-        const updateEntry: TicketUpdate = {
-          id: `u-${Date.now()}`,
-          message: staffMember
-            ? `Assigned to ${staffMember.name}`
-            : "Ticket unassigned",
-          timestamp: "Just now",
-          type: "assigned",
-        }
+  const updateTicketAssignee = useCallback(
+    (id: string, staffMember: StaffMember | null) => {
+      setTickets((prev) =>
+        prev.map((t) => {
+          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+            return t
+          const updateEntry: TicketUpdate = {
+            id: `u-${Date.now()}`,
+            message: staffMember
+              ? `Assigned to ${staffMember.name}`
+              : "Ticket unassigned",
+            timestamp: "Just now",
+            type: "assigned",
+          }
 
-        let nextStatus = t.status
-        if (!staffMember && t.status === "in_progress") {
-          nextStatus = t.ageHours > 48 ? "escalated" : "pending"
-        } else if (t.status === "pending" && staffMember) {
-          nextStatus = t.ageHours > 48 ? "escalated" : "in_progress"
-        } else if (t.ageHours > 48 && t.status !== "resolved") {
-          nextStatus = "escalated"
-        }
+          let nextStatus = t.status
+          if (!staffMember && t.status === "in_progress") {
+            nextStatus = t.ageHours > 48 ? "escalated" : "pending"
+          } else if (t.status === "pending" && staffMember) {
+            nextStatus = t.ageHours > 48 ? "escalated" : "in_progress"
+          } else if (t.ageHours > 48 && t.status !== "resolved") {
+            nextStatus = "escalated"
+          }
 
-        return {
-          ...t,
-          assignedTo: staffMember,
-          status: nextStatus,
-          updates: [...t.updates, updateEntry],
-        }
+          return {
+            ...t,
+            assignedTo: staffMember,
+            status: nextStatus,
+            updates: [...t.updates, updateEntry],
+          }
+        }),
+      )
+
+      // Persist assignee change to MongoDB
+      fetch(`/api/tickets/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assignedTo: staffMember }),
       })
-    )
-  }, [])
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.ticket) {
+            setTickets((prev) =>
+              prev.map((t) => (t.id === data.ticket.id ? data.ticket : t)),
+            )
+          }
+        })
+        .catch((err) => console.error("Error saving assignee to MongoDB:", err))
+    },
+    [],
+  )
 
   const postTicketUpdate = useCallback(
     (id: string, message: string, author: string = "Admin"): boolean => {
@@ -135,7 +217,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
       setTickets((prev) =>
         prev.map((t) => {
-          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) return t
+          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+            return t
           const updateEntry: TicketUpdate = {
             id: `u-${Date.now()}`,
             message: trimmed,
@@ -147,17 +230,37 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             ...t,
             updates: [...t.updates, updateEntry],
           }
-        })
+        }),
       )
+
+      // Persist update note to MongoDB
+      fetch(`/api/tickets/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updateMessage: trimmed, author }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.ticket) {
+            setTickets((prev) =>
+              prev.map((t) => (t.id === data.ticket.id ? data.ticket : t)),
+            )
+          }
+        })
+        .catch((err) =>
+          console.error("Error saving update note to MongoDB:", err),
+        )
+
       return true
     },
-    []
+    [],
   )
 
   const markResolved = useCallback((id: string) => {
     setTickets((prev) =>
       prev.map((t) => {
-        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) return t
+        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+          return t
         const updateEntry: TicketUpdate = {
           id: `u-${Date.now()}`,
           message: "Marked as resolved",
@@ -169,18 +272,35 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           status: "resolved",
           updates: [...t.updates, updateEntry],
         }
-      })
+      }),
     )
+
+    // Persist resolution to MongoDB
+    fetch(`/api/tickets/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "resolve" }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.ticket) {
+          setTickets((prev) =>
+            prev.map((t) => (t.id === data.ticket.id ? data.ticket : t)),
+          )
+        }
+      })
+      .catch((err) => console.error("Error saving resolution to MongoDB:", err))
   }, [])
 
   const acknowledgeAndDispatch = useCallback((id: string) => {
     setTickets((prev) =>
       prev.map((t) => {
-        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) return t
+        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+          return t
         const defaultAssignee =
           t.assignedTo ||
           mockStaff.find(
-            (s) => s.department.toLowerCase() === t.department.toLowerCase()
+            (s) => s.department.toLowerCase() === t.department.toLowerCase(),
           ) ||
           mockStaff[0]
         const updateEntry: TicketUpdate = {
@@ -195,8 +315,26 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           assignedTo: defaultAssignee,
           updates: [...t.updates, updateEntry],
         }
-      })
+      }),
     )
+
+    // Persist escalation dispatch to MongoDB
+    fetch(`/api/tickets/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "acknowledge_dispatch" }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.ticket) {
+          setTickets((prev) =>
+            prev.map((t) => (t.id === data.ticket.id ? data.ticket : t)),
+          )
+        }
+      })
+      .catch((err) =>
+        console.error("Error acknowledging escalation in MongoDB:", err),
+      )
   }, [])
 
   const createTicket = useCallback(
@@ -212,9 +350,20 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       const newId = `#${1045 + Math.floor(Math.random() * 100)}`
       const catLower = data.category.toLowerCase()
       let icon: Ticket["icon"] = "ticket"
-      if (catLower.includes("wi-fi") || catLower.includes("network")) icon = "wifi"
-      else if (catLower.includes("classroom") || catLower.includes("projector") || catLower.includes("lab")) icon = "monitor"
-      else if (catLower.includes("water") || catLower.includes("cooler") || catLower.includes("plumbing")) icon = "droplet"
+      if (catLower.includes("wi-fi") || catLower.includes("network"))
+        icon = "wifi"
+      else if (
+        catLower.includes("classroom") ||
+        catLower.includes("projector") ||
+        catLower.includes("lab")
+      )
+        icon = "monitor"
+      else if (
+        catLower.includes("water") ||
+        catLower.includes("cooler") ||
+        catLower.includes("plumbing")
+      )
+        icon = "droplet"
 
       const newTicket: Ticket = {
         id: newId,
@@ -227,13 +376,16 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         contactPhone: data.contactPhone,
         status: "pending",
         raisedBy: {
-          name: "Campus Student",
+          name: "Student",
           email: "student@glbitm.ac.in",
-          initials: "CS",
+          initials: "ST",
         },
         assignedTo: null,
         openedAt: "Just now",
-        expectedReply: data.priority === "high" || data.priority === "critical" ? "Within 6 hours" : "Within 24 hours",
+        expectedReply:
+          data.priority === "high" || data.priority === "critical"
+            ? "Within 6 hours"
+            : "Within 24 hours",
         age: "0h",
         ageHours: 0,
         icon,
@@ -247,9 +399,36 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         ],
       }
       setTickets((prev) => [newTicket, ...prev])
+
+      // Persist newly created ticket to MongoDB Atlas
+      fetch("/api/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ticketId: newId,
+          title: data.title,
+          category: data.category,
+          department: data.department,
+          description: data.description,
+          location: data.location,
+          priority: data.priority,
+          contactPhone: data.contactPhone,
+          raisedBy: newTicket.raisedBy,
+        }),
+      })
+        .then((res) => res.json())
+        .then((resp) => {
+          if (resp.success && resp.ticket) {
+            setTickets((prev) =>
+              prev.map((t) => (t.id === newId ? resp.ticket : t)),
+            )
+          }
+        })
+        .catch((err) => console.error("Error creating ticket in MongoDB:", err))
+
       return newTicket
     },
-    []
+    [],
   )
 
   const value = useMemo(
@@ -258,6 +437,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       staff: mockStaff,
       selectedTicket,
       selectedTicketId,
+      isLoading,
       selectTicket,
       updateTicketStatus,
       updateTicketAssignee,
@@ -270,6 +450,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       tickets,
       selectedTicket,
       selectedTicketId,
+      isLoading,
       selectTicket,
       updateTicketStatus,
       updateTicketAssignee,
@@ -277,10 +458,12 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       markResolved,
       acknowledgeAndDispatch,
       createTicket,
-    ]
+    ],
   )
 
-  return <TicketContext.Provider value={value}>{children}</TicketContext.Provider>
+  return (
+    <TicketContext.Provider value={value}>{children}</TicketContext.Provider>
+  )
 }
 
 export function useTickets() {

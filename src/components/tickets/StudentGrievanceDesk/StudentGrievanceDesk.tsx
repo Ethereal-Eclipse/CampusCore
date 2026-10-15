@@ -8,7 +8,7 @@ import { RaiseTicketModal } from "../RaiseTicketModal"
 import { Plus } from "@/components/ui/Icons"
 
 export function StudentGrievanceDesk() {
-  const { tickets, selectTicket } = useTickets()
+  const { tickets, selectTicket, isLoading } = useTickets()
   const [isRaiseModalOpen, setIsRaiseModalOpen] = useState(false)
 
   return (
@@ -35,15 +35,32 @@ export function StudentGrievanceDesk() {
       </header>
 
       {/* Ticket Rows list matching Image 3 */}
-      <section aria-label="Campus grievances list" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)]">
+      <section
+        aria-label="Campus grievances list"
+        className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[20px] shadow-[var(--shadow-sh)]"
+      >
         <div className="flex flex-col gap-[12px]">
-          {tickets.map((ticket) => (
-            <StudentTicketRow
-              key={ticket.id}
-              ticket={ticket}
-              onClick={() => selectTicket(ticket.id)}
-            />
-          ))}
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-[76px] rounded-[14px] bg-[var(--color-bg)] border border-[var(--color-line)] animate-pulse"
+              />
+            ))
+          ) : tickets.length > 0 ? (
+            tickets.map((ticket) => (
+              <StudentTicketRow
+                key={ticket.id}
+                ticket={ticket}
+                onClick={() => selectTicket(ticket.id)}
+              />
+            ))
+          ) : (
+            <div className="p-[36px] text-center text-[var(--color-mut)] text-[14px]">
+              No grievance tickets found. Click &quot;Raise issue&quot; above to
+              report one.
+            </div>
+          )}
         </div>
       </section>
 
