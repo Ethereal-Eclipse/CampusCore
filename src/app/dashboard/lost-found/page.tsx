@@ -1,11 +1,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { ModuleHeader } from "@/components/layout/ModuleHeader"
-import {
-  LostFoundCard,
-  LostFoundData,
-} from "@/components/dashboard/LostFoundCard"
 import { AdminLostFoundView } from "@/components/dashboard/AdminLostFoundView"
+import { StudentLostFoundView } from "@/components/dashboard/StudentLostFoundView"
 
 export const instant = false
 
@@ -17,34 +13,5 @@ export default async function LostFoundPage() {
     return <AdminLostFoundView />
   }
 
-  const dummyItems: LostFoundData[] = [
-    {
-      title: "Blue Water Bottle",
-      location: "Library 2nd Floor",
-      type: "Lost",
-      date: "Today",
-    },
-    {
-      title: "Wireless Mouse",
-      location: "Lab 4",
-      type: "Found",
-      date: "Yesterday",
-    },
-  ]
-
-  return (
-    <div className="flex flex-col gap-[20px]">
-      <ModuleHeader
-        title="Lost & Found"
-        description="Help campus belongings find their way back home."
-        actionButtonText="+ Report Item"
-      />
-
-      <section aria-label="Lost and found items catalog" className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
-        {dummyItems.map((item, i) => (
-          <LostFoundCard key={i} item={item} />
-        ))}
-      </section>
-    </div>
-  )
+  return <StudentLostFoundView />
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, CheckCircle, Plus, Pin, Clock } from "@/components/ui/Icons"
 
 interface CustodyItem {
@@ -12,38 +12,12 @@ interface CustodyItem {
   status: "In Custody" | "Claimed"
 }
 
-const INITIAL_CUSTODY: CustodyItem[] = [
-  {
-    id: "lf-1",
-    title: "Blue Water Bottle (Milton 1L)",
-    location: "Library 2nd Floor (Reading Hall)",
-    turnedInBy: "Library Staff Desk",
-    date: "Today, 11:30 AM",
-    status: "In Custody",
-  },
-  {
-    id: "lf-2",
-    title: "Wireless Mouse (Logitech M235)",
-    location: "Computer Lab 4 (Table 12)",
-    turnedInBy: "Lab Assistant",
-    date: "Yesterday",
-    status: "In Custody",
-  },
-  {
-    id: "lf-3",
-    title: "Scientific Calculator (Casio 991EX)",
-    location: "Auditorium 1",
-    turnedInBy: "Security Guard",
-    date: "2d ago",
-    status: "Claimed",
-  },
-]
-
 export function AdminLostFoundView() {
-  const [items, setItems] = useState<CustodyItem[]>(INITIAL_CUSTODY)
+  const [items, setItems] = useState<CustodyItem[]>([])
   const [title, setTitle] = useState("")
   const [location, setLocation] = useState("")
   const [turnedInBy, setTurnedInBy] = useState("Security Gate 1")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [toastMsg, setToastMsg] = useState("")
 
   const triggerToast = (msg: string) => {
@@ -51,32 +25,90 @@ export function AdminLostFoundView() {
     setTimeout(() => setToastMsg(""), 3000)
   }
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title.trim() || !location.trim()) return
-
-    const newItem: CustodyItem = {
-      id: `lf-${Date.now()}`,
-      title: title.trim(),
-      location: location.trim(),
-      turnedInBy,
-      date: "Just now",
-      status: "In Custody",
+  const fetchCustodyItems = async () => {
+    try {
+      const res = await fetch("/api/lost-found")
+      const data = await res.json()
+      if (data.success && Array.isArray(data.items)) {
+        const mapped = data.items.map((it: any) => ({
+          id: it._id,
+          title: it.title,
+          location: it.location,
+          turnedInBy: it.turnedInBy || "Campus Security Desk",
+          date: it.date || "Today",
+          status: (it.status === "Claimed" ? "Claimed" : "In Custody") as
+            "In Custody" | "Claimed",
+        }))
+        setItems(mapped)
+      }
+    } catch (err) {
+      console.error("Failed to fetch custody items:", err)
     }
-
-    setItems((prev) => [newItem, ...prev])
-    setTitle("")
-    setLocation("")
-    triggerToast("Item logged into campus security custody.")
   }
 
-  const handleMarkClaimed = (id: string) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: "Claimed" } : item
-      )
-    )
-    triggerToast("Item verified and handed over to owner.")
+  useEffect(() => {
+    fetchCustodyItems()
+  }, [])
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!title.trim() || !location.trim() || isSubmitting) return
+
+    setIsSubmitting(true)
+    try {
+      const res = await fetch("/api/lost-found", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: title.trim(),
+          location: location.trim(),
+          turnedInBy,
+          type: "Found",
+          category: "Personal Belongings",
+          description: "Logged directly at campus security desk custody",
+          status: "In Custody",
+        }),
+      })
+      const data = await res.json()
+      if (data.success && data.item) {
+        const newItem: CustodyItem = {
+          id: data.item._id,
+          title: data.item.title,
+          location: data.item.location,
+          turnedInBy: data.item.turnedInBy || turnedInBy,
+          date: "Just now",
+          status: "In Custody",
+        }
+        setItems((prev) => [newItem, ...prev])
+        setTitle("")
+        setLocation("")
+        triggerToast("Item logged into campus security custody in MongoDB.")
+      }
+    } catch (err) {
+      console.error("Failed to register custody item:", err)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleMarkClaimed = async (id: string) => {
+    try {
+      const res = await fetch(`/api/lost-found/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "Claimed" }),
+      })
+      if (res.ok) {
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, status: "Claimed" } : item,
+          ),
+        )
+        triggerToast("Item verified and handed over to owner.")
+      }
+    } catch (err) {
+      console.error("Failed to mark item claimed:", err)
+    }
   }
 
   return (
@@ -93,7 +125,8 @@ export function AdminLostFoundView() {
             </h1>
           </div>
           <p className="text-[14px] text-[var(--color-mut)]">
-            Log security turn-ins, verify student ownership claims, and track recovered campus property.
+            Log security turn-ins, verify student ownership claims, and track
+            recovered campus property.
           </p>
         </div>
 
@@ -110,7 +143,10 @@ export function AdminLostFoundView() {
       )}
 
       {/* Metric Strip */}
-      <section aria-label="Custody metrics" className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
+      <section
+        aria-label="Custody metrics"
+        className="grid grid-cols-2 md:grid-cols-4 gap-[14px]"
+      >
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Items in Custody
@@ -131,7 +167,9 @@ export function AdminLostFoundView() {
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Security Desks
           </span>
-          <span className="text-[26px] font-bold text-[var(--color-ink)]">3 Gates</span>
+          <span className="text-[26px] font-bold text-[var(--color-ink)]">
+            3 Gates
+          </span>
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
@@ -190,10 +228,18 @@ export function AdminLostFoundView() {
                 onChange={(e) => setTurnedInBy(e.target.value)}
                 className="w-full px-[12px] py-[9px] rounded-[10px] bg-[var(--color-bg)] border border-[var(--color-line)] text-[13px] text-[var(--color-ink)] outline-none cursor-pointer"
               >
-                <option value="Security Gate 1">Security Gate 1 (Main Entrance)</option>
-                <option value="Security Gate 2">Security Gate 2 (Hostel Side)</option>
-                <option value="Library Staff Desk">Central Library Staff Desk</option>
-                <option value="Admin Block Reception">Admin Block Reception</option>
+                <option value="Security Gate 1">
+                  Security Gate 1 (Main Entrance)
+                </option>
+                <option value="Security Gate 2">
+                  Security Gate 2 (Hostel Side)
+                </option>
+                <option value="Library Staff Desk">
+                  Central Library Staff Desk
+                </option>
+                <option value="Admin Block Reception">
+                  Admin Block Reception
+                </option>
               </select>
             </div>
 
