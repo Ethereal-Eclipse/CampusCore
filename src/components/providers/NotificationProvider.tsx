@@ -339,53 +339,6 @@ export function NotificationProvider({
 
     window.addEventListener("campuscore:new-ticket", handleNewTicketEvent)
 
-    // 5. Periodic sync check (every 5 seconds) to guarantee new tickets ping admin reliably
-    const pollInterval = setInterval(() => {
-      fetch("/api/tickets")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && Array.isArray(data.tickets)) {
-            let foundNew = false
-            data.tickets.forEach(
-              (t: {
-                id: string
-                title: string
-                department: string
-                priority?: string
-              }) => {
-                if (
-                  hasInitializedTicketsRef.current &&
-                  !knownTicketIdsRef.current.has(t.id)
-                ) {
-                  knownTicketIdsRef.current.add(t.id)
-                  foundNew = true
-                  const newNotif: CampusNotification = {
-                    id: `notif-${Date.now()}-${t.id.replace("#", "")}`,
-                    title: `New Grievance: ${t.id}`,
-                    desc: `${t.title} (${t.department}) - Priority: ${t.priority || "routine"}`,
-                    time: "Just now",
-                    read: false,
-                    type: "ticket",
-                    ticketId: t.id,
-                  }
-                  setNotifications((prev) => [newNotif, ...prev])
-                } else {
-                  knownTicketIdsRef.current.add(t.id)
-                }
-              },
-            )
-            if (!hasInitializedTicketsRef.current) {
-              hasInitializedTicketsRef.current = true
-            }
-            if (foundNew) {
-              triggerPing()
-              window.dispatchEvent(new CustomEvent("campuscore:tickets-sync"))
-            }
-          }
-        })
-        .catch(() => {})
-    }, 5000)
-
     return () => {
       if (eventSource) {
         eventSource.close()
@@ -393,7 +346,6 @@ export function NotificationProvider({
       if (broadcastChannel) {
         broadcastChannel.close()
       }
-      clearInterval(pollInterval)
       window.removeEventListener("campuscore:new-ticket", handleNewTicketEvent)
     }
   }, [triggerPing])
