@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation"
 
-export const instant = false
-
 export default function AdminDashboardPage() {
-  redirect("/dashboard/tickets")
+  redirect("/dashboard/tickets?view=admin")
 }

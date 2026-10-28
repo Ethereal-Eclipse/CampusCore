@@ -75,8 +75,22 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
     loadTickets()
 
+    const handleSync = () => {
+      fetch("/api/tickets")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && Array.isArray(data.tickets) && isMounted) {
+            setTickets(data.tickets)
+          }
+        })
+        .catch(() => {})
+    }
+
+    window.addEventListener("campuscore:tickets-sync", handleSync)
+
     return () => {
       isMounted = false
+      window.removeEventListener("campuscore:tickets-sync", handleSync)
     }
   }, [])
 
@@ -422,6 +436,15 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         window.dispatchEvent(
           new CustomEvent("campuscore:new-ticket", { detail: newTicket }),
         )
+        try {
+          if ("BroadcastChannel" in window) {
+            const bc = new BroadcastChannel("campuscore_events")
+            bc.postMessage({ type: "new-ticket", ticket: newTicket })
+            bc.close()
+          }
+        } catch {
+          // ignore
+        }
       }
 
       // Persist newly created ticket directly to MongoDB database

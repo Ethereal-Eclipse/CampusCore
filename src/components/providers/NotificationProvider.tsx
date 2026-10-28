@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
 } from "react"
 
 export interface CampusNotification {
@@ -29,6 +30,65 @@ interface NotificationContextType {
   markAllAsRead: () => void
   markAsRead: (id: string) => void
   triggerPing: () => void
+}
+
+let sharedAudioCtx: AudioContext | null = null
+
+function getAudioContext(): AudioContext | null {
+  if (typeof window === "undefined") return null
+  if (!sharedAudioCtx) {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext
+    if (AudioCtx) {
+      sharedAudioCtx = new AudioCtx()
+    }
+  }
+  return sharedAudioCtx
+}
+
+export function playPingSound() {
+  const ctx = getAudioContext()
+  if (!ctx) return
+
+  const resumeAndPlay = () => {
+    try {
+      const now = ctx.currentTime
+
+      // Tone 1: 880 Hz (A5 chime)
+      const osc1 = ctx.createOscillator()
+      const gain1 = ctx.createGain()
+      osc1.type = "sine"
+      osc1.frequency.setValueAtTime(880, now)
+      gain1.gain.setValueAtTime(0.25, now)
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35)
+      osc1.connect(gain1)
+      gain1.connect(ctx.destination)
+      osc1.start(now)
+      osc1.stop(now + 0.35)
+
+      // Tone 2: 1318.5 Hz (E6 sparkle)
+      const osc2 = ctx.createOscillator()
+      const gain2 = ctx.createGain()
+      osc2.type = "sine"
+      osc2.frequency.setValueAtTime(1318.5, now + 0.08)
+      gain2.gain.setValueAtTime(0.28, now + 0.08)
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45)
+      osc2.connect(gain2)
+      gain2.connect(ctx.destination)
+      osc2.start(now + 0.08)
+      osc2.stop(now + 0.45)
+    } catch {
+      // Audio autoplay policy fallback
+    }
+  }
+
+  if (ctx.state === "suspended") {
+    ctx.resume().then(resumeAndPlay).catch(() => {})
+  } else {
+    resumeAndPlay()
+  }
 }
 
 const defaultNotifications: CampusNotification[] = [
@@ -61,48 +121,6 @@ const defaultNotifications: CampusNotification[] = [
   },
 ]
 
-export function playPingSound() {
-  if (typeof window === "undefined") return
-  try {
-    const AudioCtx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext })
-        .webkitAudioContext
-    if (!AudioCtx) return
-    const ctx = new AudioCtx()
-    if (ctx.state === "suspended") {
-      ctx.resume()
-    }
-    const now = ctx.currentTime
-
-    // Primary bell chime tone (880 Hz - A5)
-    const osc1 = ctx.createOscillator()
-    const gain1 = ctx.createGain()
-    osc1.type = "sine"
-    osc1.frequency.setValueAtTime(880, now)
-    gain1.gain.setValueAtTime(0.18, now)
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35)
-    osc1.connect(gain1)
-    gain1.connect(ctx.destination)
-    osc1.start(now)
-    osc1.stop(now + 0.35)
-
-    // Harmonic sparkle chime tone (1318.5 Hz - E6)
-    const osc2 = ctx.createOscillator()
-    const gain2 = ctx.createGain()
-    osc2.type = "sine"
-    osc2.frequency.setValueAtTime(1318.5, now + 0.08)
-    gain2.gain.setValueAtTime(0.22, now + 0.08)
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45)
-    osc2.connect(gain2)
-    gain2.connect(ctx.destination)
-    osc2.start(now + 0.08)
-    osc2.stop(now + 0.45)
-  } catch {
-    // Graceful fallback if audio is not permitted by browser
-  }
-}
-
 const NotificationContext = createContext<NotificationContextType | null>(null)
 
 export function NotificationProvider({
@@ -113,6 +131,8 @@ export function NotificationProvider({
   const [notifications, setNotifications] =
     useState<CampusNotification[]>(defaultNotifications)
   const [isPinging, setIsPinging] = useState(false)
+  const knownTicketIdsRef = useRef<Set<string>>(new Set())
+  const hasInitializedTicketsRef = useRef(false)
 
   const triggerPing = useCallback(() => {
     playPingSound()
@@ -120,6 +140,25 @@ export function NotificationProvider({
     setTimeout(() => {
       setIsPinging(false)
     }, 2500)
+  }, [])
+
+  // Auto-unlock audio on first user gesture anywhere
+  useEffect(() => {
+    const unlockAudio = () => {
+      const ctx = getAudioContext()
+      if (ctx && ctx.state === "suspended") {
+        ctx.resume().catch(() => {})
+      }
+    }
+    window.addEventListener("click", unlockAudio, { once: true, passive: true })
+    window.addEventListener("keydown", unlockAudio, {
+      once: true,
+      passive: true,
+    })
+    return () => {
+      window.removeEventListener("click", unlockAudio)
+      window.removeEventListener("keydown", unlockAudio)
+    }
   }, [])
 
   // Hydrate from localStorage on client mount
@@ -136,8 +175,8 @@ export function NotificationProvider({
       // ignore
     }
 
-    // Listen for custom new-ticket event
-    const handleNewTicket = (e: Event) => {
+    // 1. Listen for local custom new-ticket event
+    const handleNewTicketEvent = (e: Event) => {
       const customEvent = e as CustomEvent<{
         id: string
         title: string
@@ -146,9 +185,12 @@ export function NotificationProvider({
       }>
       if (customEvent.detail) {
         const t = customEvent.detail
+        if (!knownTicketIdsRef.current.has(t.id)) {
+          knownTicketIdsRef.current.add(t.id)
+        }
         const newNotif: CampusNotification = {
           id: `notif-${Date.now()}`,
-          title: `New Grievance Raised: ${t.id}`,
+          title: `New Grievance: ${t.id}`,
           desc: `${t.title} (${t.department}) - Priority: ${t.priority || "routine"}`,
           time: "Just now",
           read: false,
@@ -173,26 +215,125 @@ export function NotificationProvider({
       }
     }
 
-    // Listen to cross-tab storage sync
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === "campuscore_notifications" && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue)
-          if (Array.isArray(parsed)) {
-            setNotifications(parsed)
+    // 2. Cross-tab BroadcastChannel for instant real-time notification across tabs
+    let broadcastChannel: BroadcastChannel | null = null
+    try {
+      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        broadcastChannel = new BroadcastChannel("campuscore_events")
+        broadcastChannel.onmessage = (event) => {
+          if (event.data?.type === "new-ticket" && event.data?.ticket) {
+            const t = event.data.ticket
+            if (!knownTicketIdsRef.current.has(t.id)) {
+              knownTicketIdsRef.current.add(t.id)
+              const newNotif: CampusNotification = {
+                id: `notif-${Date.now()}`,
+                title: `New Grievance: ${t.id}`,
+                desc: `${t.title} (${t.department}) - Priority: ${t.priority || "routine"}`,
+                time: "Just now",
+                read: false,
+                type: "ticket",
+                ticketId: t.id,
+              }
+
+              setNotifications((prev) => {
+                const updated = [newNotif, ...prev]
+                try {
+                  localStorage.setItem(
+                    "campuscore_notifications",
+                    JSON.stringify(updated),
+                  )
+                } catch {
+                  // ignore
+                }
+                return updated
+              })
+
+              triggerPing()
+              window.dispatchEvent(new CustomEvent("campuscore:tickets-sync"))
+            }
           }
-        } catch {
-          // ignore
         }
+      }
+    } catch {
+      // ignore
+    }
+
+    // 3. Database Polling for newly added tickets (detects tickets added by students on any tab or machine)
+    const pollDatabaseTickets = async () => {
+      try {
+        const res = await fetch("/api/tickets", { cache: "no-store" })
+        if (!res.ok) return
+        const data = await res.json()
+        if (data.success && Array.isArray(data.tickets)) {
+          if (!hasInitializedTicketsRef.current) {
+            // Populate baseline tickets on first load
+            data.tickets.forEach((t: { id: string }) => {
+              knownTicketIdsRef.current.add(t.id)
+            })
+            hasInitializedTicketsRef.current = true
+            return
+          }
+
+          // Check if any fresh ticket appeared in DB that wasn't previously known
+          const newlyAdded = data.tickets.filter(
+            (t: { id: string }) => !knownTicketIdsRef.current.has(t.id),
+          )
+
+          if (newlyAdded.length > 0) {
+            newlyAdded.forEach(
+              (t: {
+                id: string
+                title: string
+                department: string
+                priority?: string
+              }) => {
+                knownTicketIdsRef.current.add(t.id)
+                const newNotif: CampusNotification = {
+                  id: `notif-${Date.now()}-${t.id.replace("#", "")}`,
+                  title: `New Grievance: ${t.id}`,
+                  desc: `${t.title} (${t.department}) - Priority: ${t.priority || "routine"}`,
+                  time: "Just now",
+                  read: false,
+                  type: "ticket",
+                  ticketId: t.id,
+                }
+
+                setNotifications((prev) => {
+                  const updated = [newNotif, ...prev]
+                  try {
+                    localStorage.setItem(
+                      "campuscore_notifications",
+                      JSON.stringify(updated),
+                    )
+                  } catch {
+                    // ignore
+                  }
+                  return updated
+                })
+              },
+            )
+
+            triggerPing()
+            window.dispatchEvent(new CustomEvent("campuscore:tickets-sync"))
+          }
+        }
+      } catch {
+        // ignore polling network errors
       }
     }
 
-    window.addEventListener("campuscore:new-ticket", handleNewTicket)
-    window.addEventListener("storage", handleStorage)
+    // Run initial poll and start 4-second interval
+    pollDatabaseTickets()
+    const intervalId = setInterval(pollDatabaseTickets, 4000)
+
+    window.addEventListener("campuscore:new-ticket", handleNewTicketEvent)
 
     return () => {
-      window.removeEventListener("campuscore:new-ticket", handleNewTicket)
-      window.removeEventListener("storage", handleStorage)
+      clearInterval(intervalId)
+      if (broadcastChannel) {
+        broadcastChannel.close()
+      }
+      window.removeEventListener("campuscore:new-ticket", handleNewTicketEvent)
     }
   }, [triggerPing])
 
