@@ -258,78 +258,70 @@ export function NotificationProvider({
       // ignore
     }
 
-    // 3. Database Polling for newly added tickets (detects tickets added by students on any tab or machine)
-    const pollDatabaseTickets = async () => {
-      try {
-        const res = await fetch("/api/tickets", { cache: "no-store" })
-        if (!res.ok) return
-        const data = await res.json()
+    // 3. Populate baseline ticket IDs once on load (no continuous polling)
+    fetch("/api/tickets")
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success && Array.isArray(data.tickets)) {
-          if (!hasInitializedTicketsRef.current) {
-            // Populate baseline tickets on first load
-            data.tickets.forEach((t: { id: string }) => {
-              knownTicketIdsRef.current.add(t.id)
-            })
-            hasInitializedTicketsRef.current = true
-            return
-          }
-
-          // Check if any fresh ticket appeared in DB that wasn't previously known
-          const newlyAdded = data.tickets.filter(
-            (t: { id: string }) => !knownTicketIdsRef.current.has(t.id),
-          )
-
-          if (newlyAdded.length > 0) {
-            newlyAdded.forEach(
-              (t: {
-                id: string
-                title: string
-                department: string
-                priority?: string
-              }) => {
-                knownTicketIdsRef.current.add(t.id)
-                const newNotif: CampusNotification = {
-                  id: `notif-${Date.now()}-${t.id.replace("#", "")}`,
-                  title: `New Grievance: ${t.id}`,
-                  desc: `${t.title} (${t.department}) - Priority: ${t.priority || "routine"}`,
-                  time: "Just now",
-                  read: false,
-                  type: "ticket",
-                  ticketId: t.id,
-                }
-
-                setNotifications((prev) => {
-                  const updated = [newNotif, ...prev]
-                  try {
-                    localStorage.setItem(
-                      "campuscore_notifications",
-                      JSON.stringify(updated),
-                    )
-                  } catch {
-                    // ignore
-                  }
-                  return updated
-                })
-              },
-            )
-
-            triggerPing()
-            window.dispatchEvent(new CustomEvent("campuscore:tickets-sync"))
-          }
+          data.tickets.forEach((t: { id: string }) => {
+            knownTicketIdsRef.current.add(t.id)
+          })
+          hasInitializedTicketsRef.current = true
         }
-      } catch {
-        // ignore polling network errors
-      }
-    }
+      })
+      .catch(() => {})
 
-    // Run initial poll and start 4-second interval
-    pollDatabaseTickets()
-    const intervalId = setInterval(pollDatabaseTickets, 4000)
+    // 4. Server-Sent Events (SSE): Server pushes new tickets only when written to DB
+    let eventSource: EventSource | null = null
+    try {
+      if (typeof window !== "undefined" && "EventSource" in window) {
+        eventSource = new EventSource("/api/tickets/stream")
+        eventSource.addEventListener("new-ticket", (event: MessageEvent) => {
+          try {
+            const t = JSON.parse(event.data)
+            if (t && t.id && !knownTicketIdsRef.current.has(t.id)) {
+              knownTicketIdsRef.current.add(t.id)
+              const newNotif: CampusNotification = {
+                id: `notif-${Date.now()}-${t.id.replace("#", "")}`,
+                title: `New Grievance: ${t.id}`,
+                desc: `${t.title} (${t.department}) - Priority: ${t.priority || "routine"}`,
+                time: "Just now",
+                read: false,
+                type: "ticket",
+                ticketId: t.id,
+              }
+
+              setNotifications((prev) => {
+                const updated = [newNotif, ...prev]
+                try {
+                  localStorage.setItem(
+                    "campuscore_notifications",
+                    JSON.stringify(updated),
+                  )
+                } catch {
+                  // ignore
+                }
+                return updated
+              })
+
+              triggerPing()
+              window.dispatchEvent(new CustomEvent("campuscore:tickets-sync"))
+            }
+          } catch {
+            // ignore malformed push message
+          }
+        })
+      }
+    } catch {
+      // ignore
+    }
 
     window.addEventListener("campuscore:new-ticket", handleNewTicketEvent)
 
     return () => {
-      clearInterval(intervalId)
+      if (eventSource) {
+        eventSource.close()
+      }
       if (broadcastChannel) {
         broadcastChannel.close()
       }

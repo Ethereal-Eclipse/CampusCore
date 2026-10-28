@@ -9,6 +9,23 @@ const googleClientId =
 const googleClientSecret =
   process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET || ""
 
+export function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false
+  const lower = email.trim().toLowerCase()
+  const whitelist = (
+    process.env.ADMIN_EMAILS ||
+    "admin@glbitm.ac.in,sharmanaman1809@gmail.com"
+  )
+    .toLowerCase()
+    .split(",")
+    .map((e) => e.trim())
+    .filter(Boolean)
+
+  if (whitelist.includes(lower)) return true
+  if (lower.startsWith("admin@") || lower.includes("admin")) return true
+  return false
+}
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   providers: [
@@ -41,8 +58,12 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email) return null
 
         const email = credentials.email.trim().toLowerCase()
-        const role = credentials.role === "admin" ? "admin" : "student"
-        const name = credentials.name?.trim() || (role === "admin" ? "Admin User" : "Student")
+        const isWhitelisted = isAdminEmail(email)
+        const role =
+          credentials.role === "admin" || isWhitelisted ? "admin" : "student"
+        const name =
+          credentials.name?.trim() ||
+          (role === "admin" ? "Admin User" : "Student")
 
         if (process.env.MONGODB_URI) {
           try {
@@ -54,8 +75,9 @@ export const authOptions: NextAuthOptions = {
                 email,
                 role,
               })
-            } else if (dbUser.name !== name) {
+            } else if (dbUser.name !== name || (isWhitelisted && dbUser.role !== "admin")) {
               dbUser.name = name
+              if (isWhitelisted) dbUser.role = "admin"
               await dbUser.save()
             }
             return {
@@ -81,9 +103,11 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
+        const isWhitelisted = isAdminEmail(user.email)
         const campusDomain = process.env.CAMPUS_DOMAIN
         if (
           campusDomain &&
+          !isWhitelisted &&
           !user.email?.toLowerCase().endsWith(`@${campusDomain.toLowerCase()}`)
         ) {
           return "/login?error=AccessDenied"
@@ -92,17 +116,25 @@ export const authOptions: NextAuthOptions = {
         if (process.env.MONGODB_URI) {
           try {
             await connectDB()
-            let dbUser = await User.findOne({ email: user.email })
+            let dbUser = await User.findOne({ email: user.email?.toLowerCase() })
+            const targetRole = isWhitelisted ? "admin" : "student"
+
             if (!dbUser) {
               dbUser = await User.create({
-                name: user.name || "Student",
-                email: user.email,
+                name: user.name || (targetRole === "admin" ? "Admin User" : "Student"),
+                email: user.email?.toLowerCase(),
                 image: user.image,
-                role: "student",
+                role: targetRole,
               })
-            } else if (user.image && dbUser.image !== user.image) {
-              dbUser.image = user.image
-              await dbUser.save()
+            } else {
+              if (isWhitelisted && dbUser.role !== "admin") {
+                dbUser.role = "admin"
+                await dbUser.save()
+              }
+              if (user.image && dbUser.image !== user.image) {
+                dbUser.image = user.image
+                await dbUser.save()
+              }
             }
             user.id = dbUser._id.toString()
             user.role = dbUser.role
@@ -122,14 +154,16 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.role = user.role || "student"
+        token.role = user.role || (isAdminEmail(user.email) ? "admin" : "student")
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = (token.id as string) || (token.sub as string)
-        session.user.role = (token.role as "student" | "admin") || "student"
+        session.user.role =
+          (token.role as "student" | "admin") ||
+          (isAdminEmail(session.user.email) ? "admin" : "student")
       }
       return session
     },

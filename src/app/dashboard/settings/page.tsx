@@ -1,4 +1,5 @@
 import { Set, Bell, User } from "@/components/ui/Icons"
+import { AdminRolesSection } from "@/components/dashboard/AdminRolesSection"
 
 export const instant = false
 
@@ -10,7 +11,7 @@ export default async function SettingsPage() {
           Settings
         </h2>
         <p className="text-[var(--color-mut)] text-[14px]">
-          Manage your account preferences and app settings.
+          Manage your account preferences, authorization roles, and app settings.
         </p>
       </div>
 
@@ -35,6 +36,8 @@ export default async function SettingsPage() {
             </div>
           </div>
         </div>
+
+        <AdminRolesSection />
 
         <div className="p-[22px] border-b border-[var(--color-line)]">
           <h3 className="font-bold text-[18px] text-[var(--color-ink)] mb-[16px]">

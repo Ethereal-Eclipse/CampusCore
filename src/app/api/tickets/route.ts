@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { connectDB } from "@/lib/mongoose"
 import TicketModel from "@/models/Ticket"
 import { seedTickets } from "@/lib/seedTickets"
+import { broadcastNewTicket } from "@/lib/ticketEvents"
 
 function formatDoc(doc: any) {
   const elapsedHours = Math.floor(
@@ -182,6 +183,7 @@ export async function POST(req: Request) {
     })
 
     const ticket = formatDoc(newDoc)
+    broadcastNewTicket(ticket)
     return NextResponse.json({ success: true, ticket }, { status: 201 })
   } catch (err: any) {
     console.error("Error creating ticket in database:", err)
