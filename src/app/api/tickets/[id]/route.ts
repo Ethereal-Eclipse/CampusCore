@@ -4,10 +4,13 @@ import TicketModel from "@/models/Ticket"
 import { mockStaff } from "@/components/tickets/mockData"
 
 function formatDoc(doc: any) {
-  const elapsedHours = Math.floor(
-    (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
-  )
-  const effectiveAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
+  let effectiveAgeHours = doc.ageHours || 0
+  if (doc.status !== "resolved") {
+    const elapsedHours = Math.floor(
+      (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
+    )
+    effectiveAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
+  }
   const effectiveAge = `${effectiveAgeHours}h`
 
   return {
@@ -56,6 +59,13 @@ export async function PATCH(
 
     if (action === "resolve" || status === "resolved") {
       doc.status = "resolved"
+      const elapsedHours = Math.floor(
+        (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
+      )
+      const finalAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
+      doc.ageHours = finalAgeHours
+      doc.age = `${finalAgeHours}h`
+      doc.resolvedAt = new Date()
       doc.updates.push({
         id: `u-${Date.now()}`,
         message: "Marked as resolved",

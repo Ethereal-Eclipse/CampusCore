@@ -5,10 +5,13 @@ import { seedTickets } from "@/lib/seedTickets"
 import { broadcastNewTicket } from "@/lib/ticketEvents"
 
 function formatDoc(doc: any) {
-  const elapsedHours = Math.floor(
-    (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
-  )
-  const effectiveAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
+  let effectiveAgeHours = doc.ageHours || 0
+  if (doc.status !== "resolved") {
+    const elapsedHours = Math.floor(
+      (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
+    )
+    effectiveAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
+  }
   const effectiveAge = `${effectiveAgeHours}h`
 
   const effectiveStatus =

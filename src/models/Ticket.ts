@@ -40,6 +40,7 @@ export interface ITicket extends Document {
   expectedReply?: string
   age: string
   ageHours: number
+  resolvedAt?: Date
   icon?: "wifi" | "monitor" | "droplet" | "ticket" | "alert"
   updates: ITicketUpdate[]
   createdAt: Date
@@ -103,6 +104,7 @@ const TicketSchema: Schema = new Schema(
     expectedReply: { type: String },
     age: { type: String },
     ageHours: { type: Number, default: 0 },
+    resolvedAt: { type: Date },
     icon: {
       type: String,
       enum: ["wifi", "monitor", "droplet", "ticket", "alert"],
