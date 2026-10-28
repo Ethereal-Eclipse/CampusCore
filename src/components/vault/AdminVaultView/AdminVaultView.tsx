@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Book,
   Upload,
@@ -20,49 +20,111 @@ interface FlaggedItem {
   flaggedCount: number
 }
 
-const INITIAL_FLAGGED: FlaggedItem[] = [
-  {
-    id: "vault-302",
-    title: "Data Structures Hand-written Notes (Unit 4)",
-    uploadedBy: "24019cs088@glbitm.ac.in",
-    branch: "CSE",
-    semester: "Sem 3",
-    flagReason: "Incomplete pages and blurry scan quality",
-    flaggedCount: 3,
-  },
-  {
-    id: "vault-119",
-    title: "Operating Systems Old Syllabus PYQs 2018",
-    uploadedBy: "24019it142@glbitm.ac.in",
-    branch: "IT",
-    semester: "Sem 4",
-    flagReason: "Outdated 2018 syllabus curriculum",
-    flaggedCount: 2,
-  },
-]
-
 export function AdminVaultView() {
-  const [flaggedItems, setFlaggedItems] = useState<FlaggedItem[]>(INITIAL_FLAGGED)
+  const [flaggedItems, setFlaggedItems] = useState<FlaggedItem[]>([])
+  const [totalCount, setTotalCount] = useState(0)
   const [title, setTitle] = useState("")
   const [branch, setBranch] = useState("CSE")
   const [semester, setSemester] = useState("Sem 3")
   const [docType, setDocType] = useState("Notes")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleDismissFlag = (id: string) => {
-    setFlaggedItems((prev) => prev.filter((item) => item.id !== id))
+  const fetchVaultData = async () => {
+    try {
+      const res = await fetch("/api/vault")
+      const data = await res.json()
+      if (data.success && Array.isArray(data.items)) {
+        setTotalCount(data.items.length)
+        const flagged = data.items
+          .filter((it: any) => it.flagged)
+          .map((it: any) => ({
+            id: it._id,
+            title: it.title,
+            uploadedBy: it.author || "Student Contributor",
+            branch: it.branch,
+            semester: it.semester,
+            flagReason: it.flagReason || "Quality / syllabus issue reported",
+            flaggedCount: it.flaggedCount || 1,
+          }))
+        setFlaggedItems(flagged)
+      }
+    } catch (err) {
+      console.error("Failed to load vault items:", err)
+    }
   }
 
-  const handleRemoveDoc = (id: string) => {
-    setFlaggedItems((prev) => prev.filter((item) => item.id !== id))
+  useEffect(() => {
+    fetchVaultData()
+  }, [])
+
+  const handleDismissFlag = async (id: string) => {
+    try {
+      const res = await fetch(`/api/vault/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "dismiss_flag" }),
+      })
+      if (res.ok) {
+        setFlaggedItems((prev) => prev.filter((item) => item.id !== id))
+      }
+    } catch (err) {
+      console.error("Failed to dismiss flag:", err)
+    }
   }
 
-  const handleUploadSubmit = (e: React.FormEvent) => {
+  const handleRemoveDoc = async (id: string) => {
+    try {
+      const res = await fetch(`/api/vault/${id}`, {
+        method: "DELETE",
+      })
+      if (res.ok) {
+        setFlaggedItems((prev) => prev.filter((item) => item.id !== id))
+        setTotalCount((prev) => Math.max(0, prev - 1))
+      }
+    } catch (err) {
+      console.error("Failed to remove document:", err)
+    }
+  }
+
+  const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title.trim()) return
-    setUploadSuccess(true)
-    setTitle("")
-    setTimeout(() => setUploadSuccess(false), 3000)
+    if (!title.trim() || isSubmitting) return
+
+    setIsSubmitting(true)
+    try {
+      const formData = new FormData()
+      formData.append("title", title.trim())
+      formData.append("author", "Academic Faculty")
+      formData.append("branch", branch)
+      formData.append("semester", semester)
+      formData.append(
+        "type",
+        docType === "Notes" ? "PDF" : docType === "PYQ" ? "ZIP" : "PDF",
+      )
+
+      if (selectedFile) {
+        formData.append("file", selectedFile)
+      }
+
+      const res = await fetch("/api/vault", {
+        method: "POST",
+        body: formData,
+      })
+      const data = await res.json()
+      if (data.success) {
+        setUploadSuccess(true)
+        setTitle("")
+        setSelectedFile(null)
+        setTotalCount((prev) => prev + 1)
+        setTimeout(() => setUploadSuccess(false), 3000)
+      }
+    } catch (err) {
+      console.error("Failed to upload verified document:", err)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -79,7 +141,8 @@ export function AdminVaultView() {
             </h1>
           </div>
           <p className="text-[14px] text-[var(--color-mut)]">
-            Upload official department syllabus material, review quality flags, and curate repository assets.
+            Upload official department syllabus material, review quality flags,
+            and curate repository assets.
           </p>
         </div>
 
@@ -89,12 +152,17 @@ export function AdminVaultView() {
       </header>
 
       {/* Metric Strip */}
-      <section aria-label="Vault metrics" className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
+      <section
+        aria-label="Vault metrics"
+        className="grid grid-cols-2 md:grid-cols-4 gap-[14px]"
+      >
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Verified Documents
           </span>
-          <span className="text-[26px] font-bold text-[var(--color-ink)]">48</span>
+          <span className="text-[26px] font-bold text-[var(--color-ink)]">
+            {totalCount}
+          </span>
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
@@ -106,15 +174,17 @@ export function AdminVaultView() {
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
-            Pending Submissions
+            Active Repository
           </span>
-          <span className="text-[26px] font-bold text-amber-400">5</span>
+          <span className="text-[26px] font-bold text-emerald-400">Online</span>
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
-            Cloudflare R2 Storage
+            Cloudflare R2 Bucket
           </span>
-          <span className="text-[26px] font-bold text-[var(--color-ink)]">342 MB</span>
+          <span className="text-[26px] font-bold text-[var(--color-ink)]">
+            {(totalCount * 2.8).toFixed(1)} MB
+          </span>
         </article>
       </section>
 
@@ -136,7 +206,10 @@ export function AdminVaultView() {
             </div>
           )}
 
-          <form onSubmit={handleUploadSubmit} className="flex flex-col gap-[12px]">
+          <form
+            onSubmit={handleUploadSubmit}
+            className="flex flex-col gap-[12px]"
+          >
             <div>
               <label className="block text-[12px] font-semibold text-[var(--color-mut)] mb-[4px]">
                 Document Title
@@ -205,11 +278,26 @@ export function AdminVaultView() {
               </select>
             </div>
 
+            <div>
+              <label className="block text-[12px] font-semibold text-[var(--color-mut)] mb-[4px]">
+                Upload File (PDF / ZIP to Cloudflare R2)
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.zip,.doc,.docx"
+                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                className="w-full px-[12px] py-[7px] rounded-[10px] bg-[var(--color-bg)] border border-[var(--color-line)] text-[12px] text-[var(--color-mut)] outline-none file:mr-[10px] file:py-[4px] file:px-[10px] file:rounded-[6px] file:border-0 file:text-[12px] file:bg-blue-600/10 file:text-blue-500 cursor-pointer"
+              />
+            </div>
+
             <button
               type="submit"
-              className="mt-[6px] py-[10px] rounded-[10px] bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[13px] transition-all cursor-pointer active:scale-95 shadow-sm"
+              disabled={isSubmitting}
+              className="mt-[6px] py-[10px] rounded-[10px] bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold text-[13px] transition-all cursor-pointer active:scale-95 shadow-sm"
             >
-              Publish Verified Material
+              {isSubmitting
+                ? "Uploading to Cloudflare R2..."
+                : "Publish Verified Material"}
             </button>
           </form>
         </article>
@@ -246,7 +334,8 @@ export function AdminVaultView() {
                           {item.title}
                         </h4>
                         <p className="text-[12px] text-[var(--color-mut)] mt-[2px]">
-                          {item.branch} · {item.semester} · Uploaded by {item.uploadedBy}
+                          {item.branch} · {item.semester} · Uploaded by{" "}
+                          {item.uploadedBy}
                         </p>
                       </div>
                       <span className="px-[8px] py-[2px] rounded-full bg-red-500/15 text-red-400 text-[11px] font-bold shrink-0">
