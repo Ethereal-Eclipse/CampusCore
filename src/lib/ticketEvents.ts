@@ -1,6 +1,12 @@
 type TicketListener = (ticket: any) => void
 
-const listeners = new Set<TicketListener>()
+declare global {
+  var __campuscore_ticket_listeners: Set<TicketListener> | undefined
+}
+
+const listeners: Set<TicketListener> =
+  globalThis.__campuscore_ticket_listeners ||
+  (globalThis.__campuscore_ticket_listeners = new Set<TicketListener>())
 
 export function subscribeTickets(listener: TicketListener) {
   listeners.add(listener)

@@ -212,7 +212,7 @@ function BoardCard({
         isSelected
           ? "border-[var(--color-navy)] bg-[color-mix(in_srgb,var(--color-card-ref)_85%,var(--color-bg))] shadow-sm"
           : isEscalated
-            ? "border-red-500/40 border-l-[4px] border-l-red-500 bg-[var(--color-bg)] hover:bg-[color-mix(in_srgb,var(--color-card-ref)_65%,var(--color-bg))] hover:border-red-500/60 shadow-xs"
+            ? "border-red-500/30 border-l-[4px] border-l-red-500 bg-red-500/10 dark:bg-red-950/25 hover:bg-red-500/15 dark:hover:bg-red-950/35 shadow-xs"
             : "border-[var(--color-line)] bg-[var(--color-bg)] hover:bg-[color-mix(in_srgb,var(--color-card-ref)_65%,var(--color-bg))] hover:border-[var(--color-navy)]/30"
       }`}
     >

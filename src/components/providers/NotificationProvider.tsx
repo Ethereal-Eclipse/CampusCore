@@ -9,6 +9,7 @@ import React, {
   useMemo,
   useRef,
 } from "react"
+import { useSession } from "next-auth/react"
 
 export interface CampusNotification {
   id: string
@@ -85,7 +86,10 @@ export function playPingSound() {
   }
 
   if (ctx.state === "suspended") {
-    ctx.resume().then(resumeAndPlay).catch(() => {})
+    ctx
+      .resume()
+      .then(resumeAndPlay)
+      .catch(() => {})
   } else {
     resumeAndPlay()
   }
@@ -128,6 +132,14 @@ export function NotificationProvider({
 }: {
   children: React.ReactNode
 }) {
+  const { data: session } = useSession()
+  const userRole = session?.user?.role
+  const userEmail = session?.user?.email?.toLowerCase().trim()
+  const isAdmin =
+    userRole === "admin" ||
+    userEmail === "admin@glbitm.ac.in" ||
+    userEmail === "sharmanaman1809@gmail.com"
+
   const [notifications, setNotifications] =
     useState<CampusNotification[]>(defaultNotifications)
   const [isPinging, setIsPinging] = useState(false)
@@ -135,14 +147,16 @@ export function NotificationProvider({
   const hasInitializedTicketsRef = useRef(false)
 
   const triggerPing = useCallback(() => {
-    playPingSound()
+    if (isAdmin) {
+      playPingSound()
+    }
     setIsPinging(true)
     setTimeout(() => {
       setIsPinging(false)
     }, 2500)
-  }, [])
+  }, [isAdmin])
 
-  // Auto-unlock audio on first user gesture anywhere
+  // Auto-unlock audio on user interaction or window focus
   useEffect(() => {
     const unlockAudio = () => {
       const ctx = getAudioContext()
@@ -155,9 +169,16 @@ export function NotificationProvider({
       once: true,
       passive: true,
     })
+    window.addEventListener("pointerdown", unlockAudio, {
+      once: true,
+      passive: true,
+    })
+    window.addEventListener("focus", unlockAudio, { passive: true })
     return () => {
       window.removeEventListener("click", unlockAudio)
       window.removeEventListener("keydown", unlockAudio)
+      window.removeEventListener("pointerdown", unlockAudio)
+      window.removeEventListener("focus", unlockAudio)
     }
   }, [])
 
@@ -318,6 +339,53 @@ export function NotificationProvider({
 
     window.addEventListener("campuscore:new-ticket", handleNewTicketEvent)
 
+    // 5. Periodic sync check (every 5 seconds) to guarantee new tickets ping admin reliably
+    const pollInterval = setInterval(() => {
+      fetch("/api/tickets")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && Array.isArray(data.tickets)) {
+            let foundNew = false
+            data.tickets.forEach(
+              (t: {
+                id: string
+                title: string
+                department: string
+                priority?: string
+              }) => {
+                if (
+                  hasInitializedTicketsRef.current &&
+                  !knownTicketIdsRef.current.has(t.id)
+                ) {
+                  knownTicketIdsRef.current.add(t.id)
+                  foundNew = true
+                  const newNotif: CampusNotification = {
+                    id: `notif-${Date.now()}-${t.id.replace("#", "")}`,
+                    title: `New Grievance: ${t.id}`,
+                    desc: `${t.title} (${t.department}) - Priority: ${t.priority || "routine"}`,
+                    time: "Just now",
+                    read: false,
+                    type: "ticket",
+                    ticketId: t.id,
+                  }
+                  setNotifications((prev) => [newNotif, ...prev])
+                } else {
+                  knownTicketIdsRef.current.add(t.id)
+                }
+              },
+            )
+            if (!hasInitializedTicketsRef.current) {
+              hasInitializedTicketsRef.current = true
+            }
+            if (foundNew) {
+              triggerPing()
+              window.dispatchEvent(new CustomEvent("campuscore:tickets-sync"))
+            }
+          }
+        })
+        .catch(() => {})
+    }, 5000)
+
     return () => {
       if (eventSource) {
         eventSource.close()
@@ -325,6 +393,7 @@ export function NotificationProvider({
       if (broadcastChannel) {
         broadcastChannel.close()
       }
+      clearInterval(pollInterval)
       window.removeEventListener("campuscore:new-ticket", handleNewTicketEvent)
     }
   }, [triggerPing])

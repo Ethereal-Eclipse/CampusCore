@@ -39,7 +39,7 @@ export function AdminTicketRow({
         isSelected
           ? "bg-[color-mix(in_srgb,var(--color-card-ref)_80%,var(--color-bg))] border-[var(--color-navy)]/40 shadow-xs"
           : isEscalated
-            ? "bg-[var(--color-bg)] border-red-500/30 hover:border-red-500/60 hover:bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))]"
+            ? "bg-red-500/10 dark:bg-red-950/25 border-red-500/25 dark:border-red-500/30 hover:bg-red-500/15 dark:hover:bg-red-950/35"
             : "bg-[var(--color-bg)] border-[var(--color-line)] hover:bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))] hover:border-[var(--color-navy)]/30"
       }`}
     >

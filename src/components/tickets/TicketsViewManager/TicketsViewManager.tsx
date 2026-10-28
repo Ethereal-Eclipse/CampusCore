@@ -21,31 +21,43 @@ export function TicketsViewManager({
 
   const queryView = searchParams.get("view")
   const sessionRole = session?.user?.role
+  const userEmail = session?.user?.email?.toLowerCase().trim()
 
-  // Determine effective view: query param > session role > initialIsAdmin
-  const defaultToAdmin =
-    queryView === "admin" ||
-    (!queryView && (sessionRole === "admin" || initialIsAdmin))
+  const isAdmin =
+    sessionRole === "admin" ||
+    initialIsAdmin ||
+    userEmail === "admin@glbitm.ac.in" ||
+    userEmail === "sharmanaman1809@gmail.com"
 
   const [activeView, setActiveView] = useState<"admin" | "student">(
-    defaultToAdmin ? "admin" : "student",
+    isAdmin && queryView !== "student" ? "admin" : "student",
   )
 
   useEffect(() => {
+    if (!isAdmin) {
+      setActiveView("student")
+      return
+    }
     if (queryView === "admin") {
       setActiveView("admin")
     } else if (queryView === "student") {
       setActiveView("student")
-    } else if (sessionRole === "admin") {
+    } else {
       setActiveView("admin")
     }
-  }, [queryView, sessionRole])
+  }, [queryView, isAdmin])
 
   const handleSwitchView = (view: "admin" | "student") => {
+    if (!isAdmin) return
     setActiveView(view)
     const params = new URLSearchParams(searchParams.toString())
     params.set("view", view)
     router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
+
+  // If user is a student, only render StudentGrievanceDesk without the viewing mode / switcher bar
+  if (!isAdmin) {
+    return <StudentGrievanceDesk />
   }
 
   return (
