@@ -7,8 +7,13 @@ import { isTicketEscalated, getTicketSlaInfo } from "../sla"
 import { AlertTriangle, Clock, Check } from "@/components/ui/Icons"
 
 export function AdminBoardView() {
-  const { tickets, selectedTicketId, selectTicket, markResolved, acknowledgeAndDispatch } =
-    useTickets()
+  const {
+    tickets,
+    selectedTicketId,
+    selectTicket,
+    markResolved,
+    acknowledgeAndDispatch,
+  } = useTickets()
 
   const [filterMode, setFilterMode] = useState<"all" | "escalated">("all")
 
@@ -16,13 +21,18 @@ export function AdminBoardView() {
   const escalatedTickets = tickets.filter(isTicketEscalated)
   const primaryEscalated = escalatedTickets[0]
 
-  const displayedTickets = filterMode === "escalated" ? escalatedTickets : tickets
+  const displayedTickets =
+    filterMode === "escalated" ? escalatedTickets : tickets
 
   const pendingTickets = displayedTickets.filter(
-    (t) => t.status === "pending" || t.status === "escalated"
+    (t) => t.status === "pending" || t.status === "escalated",
   )
-  const inProgressTickets = displayedTickets.filter((t) => t.status === "in_progress")
-  const resolvedTickets = displayedTickets.filter((t) => t.status === "resolved")
+  const inProgressTickets = displayedTickets.filter(
+    (t) => t.status === "in_progress",
+  )
+  const resolvedTickets = displayedTickets.filter(
+    (t) => t.status === "resolved",
+  )
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -49,8 +59,8 @@ export function AdminBoardView() {
             onClick={() => setFilterMode("escalated")}
             className={`px-[16px] py-[6px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               filterMode === "escalated"
-                ? "bg-red-500/20 border border-red-500 text-red-400 font-semibold"
-                : "border border-red-500/30 text-red-400/80 hover:text-red-400 hover:border-red-500/50"
+                ? "bg-red-500/15 border border-red-500 text-red-600 dark:text-red-400 font-semibold"
+                : "border border-red-500/30 text-red-600/80 dark:text-red-400/80 hover:text-red-600 hover:border-red-500/50"
             }`}
           >
             Escalated ({escalatedTickets.length})
@@ -60,15 +70,17 @@ export function AdminBoardView() {
 
       {/* Escalation Alert Banner */}
       {primaryEscalated && (
-        <div className="p-[14px_18px] rounded-[14px] bg-red-950/40 border border-red-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-[14px] text-red-300">
+        <div className="p-[14px_18px] rounded-[14px] bg-red-500/10 border border-red-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-[14px] text-red-700 dark:text-red-300">
           <div className="flex items-start sm:items-center gap-[12px]">
-            <AlertTriangle className="w-[20px] h-[20px] text-red-400 shrink-0 mt-[2px] sm:mt-0" />
+            <AlertTriangle className="w-[20px] h-[20px] text-red-600 dark:text-red-400 shrink-0 mt-[2px] sm:mt-0" />
             <div>
-              <p className="text-[14px] font-bold text-red-200">
-                Ticket {primaryEscalated.id} unresolved for over 48 hours ({primaryEscalated.ageHours}h elapsed)
+              <p className="text-[14px] font-bold text-red-800 dark:text-red-200">
+                Ticket {primaryEscalated.id} unresolved for over 48 hours (
+                {primaryEscalated.ageHours}h elapsed)
               </p>
-              <p className="text-[12px] text-red-300/80">
-                Senior administrator has been notified. Automatic SLA escalation active.
+              <p className="text-[12px] text-red-700/80 dark:text-red-300/80">
+                Senior administrator has been notified. Automatic SLA escalation
+                active.
               </p>
             </div>
           </div>
@@ -86,7 +98,10 @@ export function AdminBoardView() {
       {/* 3 Columns: Pending, In progress, Resolved */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[18px]">
         {/* Column 1: Pending */}
-        <section aria-label="Pending tickets column" className="flex flex-col gap-[12px]">
+        <section
+          aria-label="Pending tickets column"
+          className="flex flex-col gap-[12px]"
+        >
           <div className="flex items-center justify-between px-[4px]">
             <span className="px-[10px] py-[3px] rounded-full bg-amber-400/10 text-amber-400 text-[12px] font-semibold">
               Pending
@@ -110,7 +125,10 @@ export function AdminBoardView() {
         </section>
 
         {/* Column 2: In progress */}
-        <section aria-label="In progress tickets column" className="flex flex-col gap-[12px]">
+        <section
+          aria-label="In progress tickets column"
+          className="flex flex-col gap-[12px]"
+        >
           <div className="flex items-center justify-between px-[4px]">
             <span className="px-[10px] py-[3px] rounded-full bg-blue-400/10 text-blue-400 text-[12px] font-semibold">
               In progress
@@ -134,7 +152,10 @@ export function AdminBoardView() {
         </section>
 
         {/* Column 3: Resolved */}
-        <section aria-label="Resolved tickets column" className="flex flex-col gap-[12px]">
+        <section
+          aria-label="Resolved tickets column"
+          className="flex flex-col gap-[12px]"
+        >
           <div className="flex items-center justify-between px-[4px]">
             <span className="px-[10px] py-[3px] rounded-full bg-emerald-400/10 text-emerald-400 text-[12px] font-semibold">
               Resolved
@@ -188,10 +209,10 @@ function BoardCard({
         }
       }}
       className={`p-[16px] rounded-[16px] border transition-all duration-150 cursor-pointer active:scale-[0.99] flex flex-col justify-between gap-[14px] ${
-        isEscalated
-          ? "border-red-500/40 bg-red-950/20 hover:bg-red-950/30 shadow-xs"
-          : isSelected
-            ? "border-[var(--color-navy)] bg-[color-mix(in_srgb,var(--color-card-ref)_85%,var(--color-bg))] shadow-sm"
+        isSelected
+          ? "border-[var(--color-navy)] bg-[color-mix(in_srgb,var(--color-card-ref)_85%,var(--color-bg))] shadow-sm"
+          : isEscalated
+            ? "border-red-500/40 border-l-[4px] border-l-red-500 bg-[var(--color-bg)] hover:bg-[color-mix(in_srgb,var(--color-card-ref)_65%,var(--color-bg))] hover:border-red-500/60 shadow-xs"
             : "border-[var(--color-line)] bg-[var(--color-bg)] hover:bg-[color-mix(in_srgb,var(--color-card-ref)_65%,var(--color-bg))] hover:border-[var(--color-navy)]/30"
       }`}
     >
@@ -199,11 +220,11 @@ function BoardCard({
         {/* Top Badges if Escalated/Overdue */}
         {isEscalated && (
           <div className="flex items-center justify-between gap-[8px] mb-[10px]">
-            <span className="px-[10px] py-[3px] rounded-full bg-red-500/20 text-red-400 text-[11px] font-bold inline-flex items-center gap-[4px] border border-red-500/30">
+            <span className="px-[10px] py-[3px] rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-[11px] font-bold inline-flex items-center gap-[4px] border border-red-500/20">
               <AlertTriangle className="w-[12px] h-[12px]" />
               {slaInfo.badgeLabel}
             </span>
-            <span className="text-[12px] font-semibold text-red-400">
+            <span className="text-[12px] font-semibold text-red-600 dark:text-red-400">
               {ticket.ageHours}h open
             </span>
           </div>

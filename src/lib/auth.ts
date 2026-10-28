@@ -12,16 +12,20 @@ const googleClientSecret =
 export function isAdminEmail(email?: string | null): boolean {
   if (!email) return false
   const lower = email.trim().toLowerCase()
-  const whitelist = (
-    process.env.ADMIN_EMAILS ||
-    "admin@glbitm.ac.in,sharmanaman1809@gmail.com"
-  )
+  const defaults = [
+    "admin@glbitm.ac.in",
+    "sharmanaman1809@gmail.com",
+    "namansharma1809@gmail.com",
+  ]
+  const envAdmins = (process.env.ADMIN_EMAILS || "")
     .toLowerCase()
     .split(",")
     .map((e) => e.trim())
     .filter(Boolean)
 
-  if (whitelist.includes(lower)) return true
+  const whitelist = new Set([...defaults, ...envAdmins])
+
+  if (whitelist.has(lower)) return true
   if (lower.startsWith("admin@") || lower.includes("admin")) return true
   return false
 }
@@ -75,7 +79,10 @@ export const authOptions: NextAuthOptions = {
                 email,
                 role,
               })
-            } else if (dbUser.name !== name || (isWhitelisted && dbUser.role !== "admin")) {
+            } else if (
+              dbUser.name !== name ||
+              (isWhitelisted && dbUser.role !== "admin")
+            ) {
               dbUser.name = name
               if (isWhitelisted) dbUser.role = "admin"
               await dbUser.save()
@@ -103,12 +110,26 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
-        const isWhitelisted = isAdminEmail(user.email)
+        const email = user.email?.trim().toLowerCase() || ""
+        let isWhitelisted = isAdminEmail(email)
+
+        if (!isWhitelisted && process.env.MONGODB_URI && email) {
+          try {
+            await connectDB()
+            const existing = await User.findOne({ email })
+            if (existing?.role === "admin") {
+              isWhitelisted = true
+            }
+          } catch (e) {
+            console.error("DB check error in Google signIn callback:", e)
+          }
+        }
+
         const campusDomain = process.env.CAMPUS_DOMAIN
         if (
           campusDomain &&
           !isWhitelisted &&
-          !user.email?.toLowerCase().endsWith(`@${campusDomain.toLowerCase()}`)
+          !email.endsWith(`@${campusDomain.toLowerCase()}`)
         ) {
           return "/login?error=AccessDenied"
         }
@@ -116,13 +137,15 @@ export const authOptions: NextAuthOptions = {
         if (process.env.MONGODB_URI) {
           try {
             await connectDB()
-            let dbUser = await User.findOne({ email: user.email?.toLowerCase() })
+            let dbUser = await User.findOne({ email })
             const targetRole = isWhitelisted ? "admin" : "student"
 
             if (!dbUser) {
               dbUser = await User.create({
-                name: user.name || (targetRole === "admin" ? "Admin User" : "Student"),
-                email: user.email?.toLowerCase(),
+                name:
+                  user.name ||
+                  (targetRole === "admin" ? "Admin User" : "Student"),
+                email,
                 image: user.image,
                 role: targetRole,
               })
@@ -154,7 +177,10 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.role = user.role || (isAdminEmail(user.email) ? "admin" : "student")
+        token.role =
+          user.role || (isAdminEmail(user.email) ? "admin" : "student")
+      } else if (token.email && isAdminEmail(token.email as string)) {
+        token.role = "admin"
       }
       return token
     },

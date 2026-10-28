@@ -36,10 +36,10 @@ export function AdminTicketRow({
       className={`relative flex flex-col md:flex-row md:items-center justify-between gap-[16px] p-[16px_20px] rounded-[14px] border border-l-[4px] transition-all duration-150 cursor-pointer active:scale-[0.995] ${
         isEscalated ? "border-l-red-500" : config.edgeClass
       } ${
-        isEscalated
-          ? "bg-red-950/20 border-red-500/30 hover:bg-red-950/30"
-          : isSelected
-            ? "bg-[color-mix(in_srgb,var(--color-card-ref)_80%,var(--color-bg))] border-[var(--color-navy)]/40 shadow-xs"
+        isSelected
+          ? "bg-[color-mix(in_srgb,var(--color-card-ref)_80%,var(--color-bg))] border-[var(--color-navy)]/40 shadow-xs"
+          : isEscalated
+            ? "bg-[var(--color-bg)] border-red-500/30 hover:border-red-500/60 hover:bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))]"
             : "bg-[var(--color-bg)] border-[var(--color-line)] hover:bg-[color-mix(in_srgb,var(--color-card-ref)_60%,var(--color-bg))] hover:border-[var(--color-navy)]/30"
       }`}
     >
@@ -87,7 +87,7 @@ export function AdminTicketRow({
               </span>
             </>
           ) : (
-            <span className="text-[13px] font-medium text-amber-400">
+            <span className="text-[13px] font-medium text-amber-600 dark:text-amber-400">
               Unassigned
             </span>
           )}
@@ -98,14 +98,16 @@ export function AdminTicketRow({
           <span
             className={`text-[13px] font-medium block truncate ${
               isOverdue
-                ? "text-red-400 font-bold"
+                ? "text-red-600 dark:text-red-400 font-bold"
                 : slaInfo.isResolved
-                  ? "text-emerald-400"
+                  ? "text-emerald-600 dark:text-emerald-400"
                   : "text-[var(--color-mut)]"
             }`}
             title={slaInfo.timeLabel}
           >
-            {isOverdue ? `${ticket.ageHours}h (+${slaInfo.overdueHours}h)` : ticket.age}
+            {isOverdue
+              ? `${ticket.ageHours}h (+${slaInfo.overdueHours}h)`
+              : ticket.age}
           </span>
         </div>
 

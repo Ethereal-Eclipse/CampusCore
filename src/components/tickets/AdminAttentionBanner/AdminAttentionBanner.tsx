@@ -18,7 +18,7 @@ export function AdminAttentionBanner({
   return (
     <aside
       role="alert"
-      className={`flex items-center justify-between gap-[16px] p-[14px_18px] rounded-[12px] bg-red-500/10 border border-red-500/20 text-red-400 ${className}`}
+      className={`flex items-center justify-between gap-[16px] p-[14px_18px] rounded-[12px] bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 ${className}`}
     >
       <div className="flex items-center gap-[10px] min-w-0">
         <AlertTriangle className="w-[18px] h-[18px] shrink-0" />
@@ -33,8 +33,8 @@ export function AdminAttentionBanner({
         onClick={onReviewClick}
         className={`px-[16px] py-[6px] rounded-full text-[13px] font-semibold transition-all cursor-pointer shrink-0 active:scale-95 ${
           isFilterActive
-            ? "bg-red-400 text-black hover:bg-red-300"
-            : "bg-red-400/20 hover:bg-red-400/30 text-red-300 border border-red-400/30"
+            ? "bg-red-500 text-white hover:bg-red-600"
+            : "bg-red-500/15 hover:bg-red-500/25 text-red-700 dark:text-red-300 border border-red-500/30"
         }`}
       >
         {isFilterActive ? "Clear review" : "Review"}

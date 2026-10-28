@@ -4,7 +4,14 @@ export interface TicketUpdate {
   id: string
   message: string
   timestamp: string
-  type: "submitted" | "assigned" | "in_progress" | "resolved" | "note" | "escalated" | "pending"
+  type:
+    | "submitted"
+    | "assigned"
+    | "in_progress"
+    | "resolved"
+    | "note"
+    | "escalated"
+    | "pending"
   author?: string
 }
 
@@ -86,10 +93,11 @@ export const statusConfig: Record<TicketStatus, StatusConfigEntry> = {
   escalated: {
     label: "Escalated",
     colorName: "red",
-    pillClass: "bg-red-400/10 text-red-400",
-    chipClass: "bg-red-400/10 text-red-400",
-    barClass: "bg-red-400",
-    edgeClass: "border-l-red-400",
+    pillClass:
+      "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20",
+    chipClass: "bg-red-500/10 text-red-600 dark:text-red-400",
+    barClass: "bg-red-500",
+    edgeClass: "border-l-red-500",
     iconName: "alert-triangle",
     step: 3,
   },
