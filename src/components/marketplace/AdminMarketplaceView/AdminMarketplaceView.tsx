@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Cart, AlertTriangle, Shield, CheckCircle } from "@/components/ui/Icons"
 
 interface ReportedSeller {
@@ -13,29 +13,10 @@ interface ReportedSeller {
   lastActive: string
 }
 
-const INITIAL_REPORTS: ReportedSeller[] = [
-  {
-    id: "user-884",
-    seller: "Karan Mehta",
-    email: "23019me054@glbitm.ac.in",
-    listing: "Engineering Graphics Drafter Tool Set",
-    reports: 4,
-    reason: "Repeatedly unresponsive to buyer meeting requests (Ghosting)",
-    lastActive: "1d ago",
-  },
-  {
-    id: "user-412",
-    seller: "Aman Gupta",
-    email: "22019cs012@glbitm.ac.in",
-    listing: "Casio fx-991EX Calculator",
-    reports: 2,
-    reason: "Pricing discrepancies and counterfeit product claims",
-    lastActive: "3h ago",
-  },
-]
-
 export function AdminMarketplaceView() {
-  const [reports, setReports] = useState<ReportedSeller[]>(INITIAL_REPORTS)
+  const [reports, setReports] = useState<ReportedSeller[]>([])
+  const [activeCount, setActiveCount] = useState(0)
+  const [tradeVolume, setTradeVolume] = useState(24800)
   const [toastMessage, setToastMessage] = useState("")
 
   const triggerToast = (msg: string) => {
@@ -43,18 +24,79 @@ export function AdminMarketplaceView() {
     setTimeout(() => setToastMessage(""), 3000)
   }
 
-  const handleDismiss = (id: string) => {
-    setReports((prev) => prev.filter((r) => r.id !== id))
-    triggerToast("Report dismissed.")
+  const fetchDisputes = async () => {
+    try {
+      const res = await fetch("/api/marketplace?reported=true")
+      const data = await res.json()
+      if (data.success && Array.isArray(data.items)) {
+        const formatted = data.items.map((it: any) => ({
+          id: it._id,
+          seller: it.seller?.name || "Student Seller",
+          email: it.seller?.email || "student@glbitm.ac.in",
+          listing: it.title,
+          reports: it.reportsCount || 1,
+          reason: it.reportReason || "Community dispute reported",
+          lastActive: "Active today",
+        }))
+        setReports(formatted)
+      }
+
+      const allRes = await fetch("/api/marketplace")
+      const allData = await allRes.json()
+      if (allData.success && Array.isArray(allData.items)) {
+        setActiveCount(allData.items.length)
+        const total = allData.items.reduce((acc: number, it: any) => {
+          const num = parseInt((it.price || "").replace(/[^0-9]/g, ""), 10) || 0
+          return acc + num
+        }, 0)
+        if (total > 0) setTradeVolume(total)
+      }
+    } catch (err) {
+      console.error("Failed to load marketplace disputes:", err)
+    }
+  }
+
+  useEffect(() => {
+    fetchDisputes()
+  }, [])
+
+  const handleDismiss = async (id: string) => {
+    try {
+      const res = await fetch(`/api/marketplace/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "dismiss_report" }),
+      })
+      if (res.ok) {
+        setReports((prev) => prev.filter((r) => r.id !== id))
+        triggerToast("Report dismissed.")
+      }
+    } catch (err) {
+      console.error("Failed to dismiss report:", err)
+    }
   }
 
   const handleWarn = (id: string, name: string) => {
     triggerToast(`Official warning issued to ${name}.`)
   }
 
-  const handleSuspend = (id: string, name: string) => {
-    setReports((prev) => prev.filter((r) => r.id !== id))
-    triggerToast(`Seller account ${name} suspended from campus marketplace.`)
+  const handleSuspend = async (id: string, name: string) => {
+    try {
+      const res = await fetch(`/api/marketplace/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "suspend" }),
+      })
+      if (res.ok) {
+        setReports((prev) => prev.filter((r) => r.id !== id))
+        setActiveCount((prev) => Math.max(0, prev - 1))
+        triggerToast(
+          `Seller account ${name} suspended from campus marketplace.`,
+        )
+      }
+    } catch (err) {
+      console.error("Failed to suspend seller:", err)
+    }
   }
 
   return (
@@ -71,7 +113,8 @@ export function AdminMarketplaceView() {
             </h1>
           </div>
           <p className="text-[14px] text-[var(--color-mut)]">
-            Review reported sellers, investigate listing disputes, and maintain fair peer-to-peer campus trading.
+            Review reported sellers, investigate listing disputes, and maintain
+            fair peer-to-peer campus trading.
           </p>
         </div>
 
@@ -88,12 +131,17 @@ export function AdminMarketplaceView() {
       )}
 
       {/* Metric Strip */}
-      <section aria-label="Marketplace metrics" className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
+      <section
+        aria-label="Marketplace metrics"
+        className="grid grid-cols-2 md:grid-cols-4 gap-[14px]"
+      >
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Active Listings
           </span>
-          <span className="text-[26px] font-bold text-[var(--color-ink)]">38</span>
+          <span className="text-[26px] font-bold text-[var(--color-ink)]">
+            {activeCount}
+          </span>
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
@@ -105,20 +153,25 @@ export function AdminMarketplaceView() {
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
-            Resolved Flags
+            Cloudinary Sync
           </span>
-          <span className="text-[26px] font-bold text-emerald-400">14</span>
+          <span className="text-[26px] font-bold text-emerald-400">Active</span>
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
-            Trade Volume
+            Market Volume
           </span>
-          <span className="text-[26px] font-bold text-[var(--color-ink)]">₹24,800</span>
+          <span className="text-[26px] font-bold text-[var(--color-ink)]">
+            ₹{tradeVolume.toLocaleString()}
+          </span>
         </article>
       </section>
 
       {/* Reported Sellers Section */}
-      <section aria-label="Reported sellers and disputes" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
+      <section
+        aria-label="Reported sellers and disputes"
+        className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]"
+      >
         <div className="flex items-center justify-between mb-[16px]">
           <div className="flex items-center gap-[10px]">
             <AlertTriangle className="w-[18px] h-[18px] text-red-400" />
@@ -133,7 +186,8 @@ export function AdminMarketplaceView() {
 
         {reports.length === 0 ? (
           <div className="p-[32px] text-center text-[var(--color-mut)] text-[13px] border border-dashed border-[var(--color-line)] rounded-[14px]">
-            ✓ No reported sellers or listing disputes. Marketplace trust index is 100%.
+            ✓ No reported sellers or listing disputes. Marketplace trust index
+            is 100%.
           </div>
         ) : (
           <div className="flex flex-col gap-[12px]">
