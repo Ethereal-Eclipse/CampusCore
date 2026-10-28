@@ -17,7 +17,7 @@ export function AdminManagementList() {
   const [activeTab, setActiveTab] = useState<"list" | "board">("list")
   const [departmentFilter, setDepartmentFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [sortOrder, setSortOrder] = useState<"oldest" | "newest">("oldest")
+  const [sortOrder, setSortOrder] = useState<"oldest" | "newest">("newest")
   const [isReviewFilterActive, setIsReviewFilterActive] = useState(false)
 
   const overdueCount = tickets.filter(
@@ -53,7 +53,7 @@ export function AdminManagementList() {
       }
     }
 
-    // Sort: oldest first (default) vs newest first
+    // Sort: newest first (default) vs oldest first
     list.sort((a, b) => {
       // Escalated / SLA breached rows are pinned to the top!
       const aEsc = isTicketEscalated(a)
@@ -62,9 +62,11 @@ export function AdminManagementList() {
       if (!aEsc && bEsc) return 1
 
       if (sortOrder === "oldest") {
-        return b.ageHours - a.ageHours
+        if (b.ageHours !== a.ageHours) return b.ageHours - a.ageHours
+        return a.id.localeCompare(b.id)
       } else {
-        return a.ageHours - b.ageHours
+        if (a.ageHours !== b.ageHours) return a.ageHours - b.ageHours
+        return b.id.localeCompare(a.id)
       }
     })
 

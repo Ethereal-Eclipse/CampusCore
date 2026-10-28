@@ -54,9 +54,10 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     urlSelectedId,
   )
 
-  // Fetch tickets from MongoDB Atlas on mount
+  // Fetch tickets directly from database on mount
   useEffect(() => {
     let isMounted = true
+
     async function loadTickets() {
       try {
         const res = await fetch("/api/tickets")
@@ -66,12 +67,14 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           setTickets(data.tickets)
         }
       } catch (err) {
-        console.error("Failed to load tickets from MongoDB Atlas:", err)
+        console.error("Failed to load tickets from database:", err)
       } finally {
         if (isMounted) setIsLoading(false)
       }
     }
+
     loadTickets()
+
     return () => {
       isMounted = false
     }
@@ -112,11 +115,12 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
   const updateTicketStatus = useCallback(
     (id: string, newStatus: TicketStatus) => {
+      // Optimistic state update
       setTickets((prev) =>
         prev.map((t) => {
-          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) {
             return t
-          // Auto-escalation math: unresolved ticket over 48h must remain/turn back escalated
+          }
           const effectiveStatus: TicketStatus =
             newStatus !== "resolved" && t.ageHours > 48
               ? "escalated"
@@ -139,7 +143,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         }),
       )
 
-      // Persist status change to MongoDB
+      // Persist status change to database
       fetch(`/api/tickets/${encodeURIComponent(id)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -153,7 +157,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             )
           }
         })
-        .catch((err) => console.error("Error saving status to MongoDB:", err))
+        .catch((err) => console.error("Error saving status to database:", err))
     },
     [],
   )
@@ -162,8 +166,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     (id: string, staffMember: StaffMember | null) => {
       setTickets((prev) =>
         prev.map((t) => {
-          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) {
             return t
+          }
           const updateEntry: TicketUpdate = {
             id: `u-${Date.now()}`,
             message: staffMember
@@ -191,7 +196,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         }),
       )
 
-      // Persist assignee change to MongoDB
+      // Persist assignee change to database
       fetch(`/api/tickets/${encodeURIComponent(id)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -205,7 +210,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             )
           }
         })
-        .catch((err) => console.error("Error saving assignee to MongoDB:", err))
+        .catch((err) => console.error("Error saving assignee to database:", err))
     },
     [],
   )
@@ -217,8 +222,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
       setTickets((prev) =>
         prev.map((t) => {
-          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+          if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) {
             return t
+          }
           const updateEntry: TicketUpdate = {
             id: `u-${Date.now()}`,
             message: trimmed,
@@ -233,7 +239,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         }),
       )
 
-      // Persist update note to MongoDB
+      // Persist update note to database
       fetch(`/api/tickets/${encodeURIComponent(id)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -248,7 +254,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           }
         })
         .catch((err) =>
-          console.error("Error saving update note to MongoDB:", err),
+          console.error("Error saving update note to database:", err),
         )
 
       return true
@@ -259,8 +265,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
   const markResolved = useCallback((id: string) => {
     setTickets((prev) =>
       prev.map((t) => {
-        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) {
           return t
+        }
         const updateEntry: TicketUpdate = {
           id: `u-${Date.now()}`,
           message: "Marked as resolved",
@@ -275,7 +282,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       }),
     )
 
-    // Persist resolution to MongoDB
+    // Persist resolution to database
     fetch(`/api/tickets/${encodeURIComponent(id)}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -289,14 +296,15 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           )
         }
       })
-      .catch((err) => console.error("Error saving resolution to MongoDB:", err))
+      .catch((err) => console.error("Error saving resolution to database:", err))
   }, [])
 
   const acknowledgeAndDispatch = useCallback((id: string) => {
     setTickets((prev) =>
       prev.map((t) => {
-        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", ""))
+        if (t.id !== id && t.id.replace("#", "") !== id.replace("#", "")) {
           return t
+        }
         const defaultAssignee =
           t.assignedTo ||
           mockStaff.find(
@@ -318,7 +326,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       }),
     )
 
-    // Persist escalation dispatch to MongoDB
+    // Persist escalation dispatch to database
     fetch(`/api/tickets/${encodeURIComponent(id)}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -333,7 +341,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch((err) =>
-        console.error("Error acknowledging escalation in MongoDB:", err),
+        console.error("Error acknowledging escalation in database:", err),
       )
   }, [])
 
@@ -347,26 +355,33 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       priority?: Ticket["priority"]
       contactPhone?: string
     }) => {
-      const newId = `#${1045 + Math.floor(Math.random() * 100)}`
+      let maxNum = 1044
+      for (const t of tickets) {
+        const n = parseInt(t.id.replace(/[^0-9]/g, ""), 10)
+        if (!isNaN(n) && n > maxNum) maxNum = n
+      }
+      const tempId = `#${maxNum + 1}`
+
       const catLower = data.category.toLowerCase()
       let icon: Ticket["icon"] = "ticket"
-      if (catLower.includes("wi-fi") || catLower.includes("network"))
+      if (catLower.includes("wi-fi") || catLower.includes("network")) {
         icon = "wifi"
-      else if (
+      } else if (
         catLower.includes("classroom") ||
         catLower.includes("projector") ||
         catLower.includes("lab")
-      )
+      ) {
         icon = "monitor"
-      else if (
+      } else if (
         catLower.includes("water") ||
         catLower.includes("cooler") ||
         catLower.includes("plumbing")
-      )
+      ) {
         icon = "droplet"
+      }
 
       const newTicket: Ticket = {
-        id: newId,
+        id: tempId,
         title: data.title,
         description: data.description,
         category: data.category,
@@ -398,14 +413,23 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           },
         ],
       }
+
+      // Add to React state immediately
       setTickets((prev) => [newTicket, ...prev])
 
-      // Persist newly created ticket to MongoDB Atlas
+      // Dispatch custom event for admin notifications and audio ping chime
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("campuscore:new-ticket", { detail: newTicket }),
+        )
+      }
+
+      // Persist newly created ticket directly to MongoDB database
       fetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ticketId: newId,
+          ticketId: tempId,
           title: data.title,
           category: data.category,
           department: data.department,
@@ -420,15 +444,15 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         .then((resp) => {
           if (resp.success && resp.ticket) {
             setTickets((prev) =>
-              prev.map((t) => (t.id === newId ? resp.ticket : t)),
+              prev.map((t) => (t.id === tempId ? resp.ticket : t)),
             )
           }
         })
-        .catch((err) => console.error("Error creating ticket in MongoDB:", err))
+        .catch((err) => console.error("Error creating ticket in database:", err))
 
       return newTicket
     },
-    [],
+    [tickets],
   )
 
   const value = useMemo(

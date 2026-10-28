@@ -1,54 +1,102 @@
-import { Bell, Alert } from "@/components/ui/Icons"
+"use client"
+
+import { useRouter } from "next/navigation"
+import { Bell, Alert, Ticket, Volume2 } from "@/components/ui/Icons"
 import { ModuleHeader } from "@/components/layout/ModuleHeader"
-import {
-  NotificationItem,
-  NotificationData,
-} from "@/components/dashboard/NotificationItem"
+import { NotificationItem } from "@/components/dashboard/NotificationItem"
+import { useNotifications } from "@/components/providers/NotificationProvider"
 
-export const instant = false
+export default function NotificationsPage() {
+  const router = useRouter()
+  const { notifications, unreadCount, markAllAsRead, markAsRead, triggerPing } =
+    useNotifications()
 
-export default async function NotificationsPage() {
-  const dummyNotifs: NotificationData[] = [
-    {
-      title: "Ticket #1041 Resolved",
-      desc: "Your grievance has been resolved by the admin.",
-      time: "1h ago",
-      read: false,
-      icon: <Alert className="w-5 h-5" />,
-      color: "bg-[#e4f9ee] text-[#10b981]",
-    },
-    {
-      title: "New Event: Tech Club Meetup",
-      desc: "Join us for the weekly tech club meetup at 2 PM.",
-      time: "5h ago",
-      read: false,
-      icon: <Bell className="w-5 h-5" />,
-      color: "bg-[#e8f1ff] text-[#3b82f6]",
-    },
-    {
-      title: "Library Book Due",
-      desc: 'Your book "Introduction to Algorithms" is due tomorrow.',
-      time: "1d ago",
-      read: true,
-      icon: <Alert className="w-5 h-5" />,
-      color: "bg-[#ffecee] text-[#ef4444]",
-    },
-  ]
+  const handleNotificationClick = (id: string, ticketId?: string) => {
+    markAsRead(id)
+    if (ticketId) {
+      router.push(`/dashboard/tickets?ticket=${ticketId.replace("#", "")}`)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-[20px]">
       <ModuleHeader
-        title="Notifications"
-        description="Stay updated with your campus alerts and announcements."
-        actionButtonText="Mark all as read"
-      />
+        title="Notifications & Alerts"
+        description={
+          unreadCount > 0
+            ? `You have ${unreadCount} unread alert${unreadCount > 1 ? "s" : ""}. Grievance updates and critical campus notices.`
+            : "Stay updated with your campus alerts, grievances, and announcements."
+        }
+        actionButtonText={unreadCount > 0 ? "Mark all as read" : undefined}
+        onAction={markAllAsRead}
+      >
+        <button
+          type="button"
+          onClick={triggerPing}
+          className="flex items-center gap-[6px] px-[16px] py-[10px] rounded-full border border-[var(--color-line)] bg-[var(--color-bg)] hover:bg-[var(--color-card-ref)] text-[var(--color-ink)] font-semibold text-[13px] transition-all cursor-pointer hover:border-blue-500/50 shadow-xs active:scale-95"
+          title="Play real-time campus chime ping audio"
+        >
+          <Volume2 className="w-[16px] h-[16px] text-blue-500" />
+          <span>Test Audio Ping</span>
+        </button>
+      </ModuleHeader>
 
-      <section aria-label="Notifications list" className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
-        <div className="flex flex-col gap-[14px]">
-          {dummyNotifs.map((notif, i) => (
-            <NotificationItem key={i} notification={notif} />
-          ))}
-        </div>
+      <section
+        aria-label="Notifications list"
+        className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]"
+      >
+        {notifications.length > 0 ? (
+          <div className="flex flex-col gap-[14px]">
+            {notifications.map((notif) => {
+              const isTicket = notif.type === "ticket" || !!notif.ticketId
+              const icon = isTicket ? (
+                <Ticket className="w-5 h-5" />
+              ) : notif.title.toLowerCase().includes("urgent") ||
+                notif.title.toLowerCase().includes("escalated") ? (
+                <Alert className="w-5 h-5" />
+              ) : (
+                <Bell className="w-5 h-5" />
+              )
+
+              const color = notif.title.toLowerCase().includes("escalated")
+                ? "bg-[#ffecee] text-[#ef4444]"
+                : notif.title.toLowerCase().includes("resolved")
+                  ? "bg-[#e4f9ee] text-[#10b981]"
+                  : "bg-[#e8f1ff] text-[#3b82f6]"
+
+              return (
+                <NotificationItem
+                  key={notif.id}
+                  notification={{
+                    id: notif.id,
+                    title: notif.title,
+                    desc: notif.desc,
+                    time: notif.time,
+                    read: notif.read,
+                    icon,
+                    color,
+                  }}
+                  onClick={() =>
+                    handleNotificationClick(notif.id, notif.ticketId)
+                  }
+                />
+              )
+            })}
+          </div>
+        ) : (
+          <div className="p-[48px_16px] text-center flex flex-col items-center justify-center gap-[10px]">
+            <div className="w-[48px] h-[48px] rounded-full bg-[var(--color-bg)] border border-[var(--color-line)] grid place-items-center text-[var(--color-mut)]">
+              <Bell className="w-[20px] h-[20px]" />
+            </div>
+            <p className="font-semibold text-[15px] text-[var(--color-ink)]">
+              No notifications yet
+            </p>
+            <p className="text-[13px] text-[var(--color-mut)] max-w-[360px]">
+              When new student grievances are filed or system updates are
+              posted, they will appear here with instant audio chime alerts.
+            </p>
+          </div>
+        )}
       </section>
     </div>
   )

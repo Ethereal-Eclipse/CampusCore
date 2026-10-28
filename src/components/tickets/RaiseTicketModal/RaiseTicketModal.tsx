@@ -46,6 +46,7 @@ const PRESET_TOPICS = [
 export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
   const { createTicket, selectTicket } = useTickets()
 
+  const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
   const [title, setTitle] = useState("")
   const [department, setDepartment] = useState("IT Desk")
   const [category, setCategory] = useState("IT and network")
@@ -55,26 +56,47 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
   const [description, setDescription] = useState("")
   const [error, setError] = useState("")
 
+  const handleClose = () => {
+    setTitle("")
+    setLocation("")
+    setContactPhone("")
+    setDescription("")
+    setError("")
+    setSelectedPreset(null)
+    onClose()
+  }
+
   useEffect(() => {
     if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" || e.code === "Escape") {
         e.preventDefault()
         e.stopPropagation()
-        onClose()
+        handleClose()
       }
     }
     window.addEventListener("keydown", handleKeyDown, { capture: true })
     return () => window.removeEventListener("keydown", handleKeyDown, { capture: true })
-  }, [isOpen, onClose])
+  }, [isOpen])
 
   if (!isOpen) return null
 
   const handleApplyPreset = (preset: (typeof PRESET_TOPICS)[0]) => {
+    setSelectedPreset(preset.label)
     setCategory(preset.category)
     setDepartment(preset.department)
-    if (!title) {
-      setTitle(preset.placeholder.replace("e.g. ", ""))
+    setTitle(preset.placeholder.replace("e.g. ", ""))
+
+    if (preset.label === "Wi-Fi & Network") {
+      setLocation("Computer Lab 3, 2nd Floor")
+    } else if (preset.label === "Lab / Hardware") {
+      setLocation("Computer Lab 1, Terminal #14")
+    } else if (preset.label === "Projector / AV") {
+      setLocation("Room 402, Academic Block")
+    } else if (preset.label === "Electrical / AC") {
+      setLocation("Auditorium 1, Ground Floor")
+    } else if (preset.label === "Water / Sanitation") {
+      setLocation("2nd Floor Hallway, West Wing")
     }
   }
 
@@ -95,19 +117,14 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
       description: description.trim(),
     })
 
-    onClose()
-    setTitle("")
-    setLocation("")
-    setContactPhone("")
-    setDescription("")
-    setError("")
+    handleClose()
     selectTicket(newTicket.id)
   }
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-[16px] bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-150"
-      onClick={onClose}
+      onClick={handleClose}
       role="dialog"
       aria-modal="true"
     >
@@ -127,7 +144,7 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close modal"
             className="w-[30px] h-[30px] rounded-full grid place-items-center text-[var(--color-mut)] hover:text-[var(--color-ink)] hover:bg-[var(--color-bg)] transition-colors cursor-pointer shrink-0 ml-[12px]"
           >
@@ -155,7 +172,7 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
                   type="button"
                   onClick={() => handleApplyPreset(preset)}
                   className={`text-[12px] px-[10px] py-[4px] rounded-full border transition-all cursor-pointer ${
-                    category === preset.category
+                    selectedPreset === preset.label
                       ? "bg-blue-600/20 text-blue-400 border-blue-500/40 font-semibold"
                       : "bg-[var(--color-bg)] text-[var(--color-mut)] border-[var(--color-line)] hover:text-[var(--color-ink)]"
                   }`}
@@ -195,7 +212,8 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
                 >
                   <option value="IT Desk">IT Desk</option>
                   <option value="Infrastructure">Infrastructure</option>
-                  <option value="Facilities">Facilities &amp; Maintenance</option>
+                  <option value="Maintenance">Maintenance</option>
+                  <option value="Facilities">Facilities</option>
                   <option value="Academic">Academic Affairs</option>
                   <option value="Hostel">Hostel Administration</option>
                 </select>
@@ -326,7 +344,7 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
         <footer className="p-[16px_24px] border-t border-[var(--color-line)] flex items-center justify-end gap-[10px] shrink-0 bg-[var(--color-card-ref)]">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="px-[16px] py-[9px] rounded-[10px] border border-[var(--color-line)] text-[13px] font-semibold text-[var(--color-mut)] hover:text-[var(--color-ink)] hover:bg-[var(--color-bg)] transition-colors cursor-pointer"
           >
             Cancel

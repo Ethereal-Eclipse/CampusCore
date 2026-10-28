@@ -14,6 +14,7 @@ import {
   Set,
 } from "@/components/ui/Icons"
 import { LogoutButton } from "@/components/layout/LogoutButton"
+import { useNotifications } from "@/components/providers/NotificationProvider"
 
 interface SidebarNavProps {
   userRole?: string
@@ -21,6 +22,7 @@ interface SidebarNavProps {
 
 export function SidebarNav({ userRole }: SidebarNavProps) {
   const pathname = usePathname()
+  const { unreadCount, isPinging } = useNotifications()
 
   const mainLinks = [
     {
@@ -64,7 +66,7 @@ export function SidebarNav({ userRole }: SidebarNavProps) {
       label: "Notifications",
       icon: Bell,
       exact: false,
-      badge: "3",
+      badge: unreadCount > 0 ? String(unreadCount) : undefined,
     },
   ]
 
@@ -99,7 +101,7 @@ export function SidebarNav({ userRole }: SidebarNavProps) {
           <Link
             key={item.href}
             href={item.href}
-            className={`p-[10px_14px] rounded-[10px] text-[15px] font-medium flex items-center gap-[12px] transition-all ${
+            className={`p-[10px_14px] rounded-[10px] text-[15px] font-medium flex items-center gap-[12px] transition-all relative ${
               active
                 ? "bg-gradient-to-r from-[var(--color-navy)] to-[var(--color-navy2)] text-white shadow-xs font-semibold"
                 : "text-[var(--color-mut)] hover:text-[var(--color-ink)] hover:bg-[var(--color-bu)]"
@@ -108,8 +110,13 @@ export function SidebarNav({ userRole }: SidebarNavProps) {
             <Icon className="w-[18px] h-[18px] shrink-0" />
             <span className="truncate">{item.label}</span>
             {item.badge && (
-              <span className="ml-auto bg-[#ef4444] text-white rounded-full min-w-[22px] text-center text-[11px] py-[2px] px-[6px] font-bold">
-                {item.badge}
+              <span className="relative ml-auto flex items-center">
+                {isPinging && (
+                  <span className="absolute -inset-1 rounded-full bg-red-500 animate-ping opacity-75" />
+                )}
+                <span className="relative bg-[#ef4444] text-white rounded-full min-w-[22px] text-center text-[11px] py-[2px] px-[6px] font-bold">
+                  {item.badge}
+                </span>
               </span>
             )}
           </Link>

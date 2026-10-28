@@ -33,5 +33,6 @@ export {
   Droplet,
   Monitor,
   ArrowUpDown,
+  Volume2,
 } from "lucide-react"
 

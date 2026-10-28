@@ -3,6 +3,34 @@ import { connectDB } from "@/lib/mongoose"
 import TicketModel from "@/models/Ticket"
 import { mockStaff } from "@/components/tickets/mockData"
 
+function formatDoc(doc: any) {
+  const elapsedHours = Math.floor(
+    (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
+  )
+  const effectiveAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
+  const effectiveAge = `${effectiveAgeHours}h`
+
+  return {
+    id: doc.ticketId,
+    title: doc.title,
+    description: doc.description,
+    category: doc.category,
+    department: doc.department,
+    location: doc.location,
+    priority: doc.priority || "medium",
+    contactPhone: doc.contactPhone,
+    status: doc.status,
+    raisedBy: doc.raisedBy,
+    assignedTo: doc.assignedTo || null,
+    openedAt: doc.openedAt,
+    expectedReply: doc.expectedReply,
+    age: effectiveAge,
+    ageHours: effectiveAgeHours,
+    icon: doc.icon || "ticket",
+    updates: doc.updates || [],
+  }
+}
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -12,6 +40,8 @@ export async function PATCH(
     const { id } = await params
     const rawId = decodeURIComponent(id)
     const targetId = rawId.startsWith("#") ? rawId : `#${rawId}`
+    const body = await req.json()
+    const { status, assignedTo, updateMessage, author = "Admin", action } = body
 
     const doc = await TicketModel.findOne({
       $or: [{ ticketId: targetId }, { ticketId: rawId }],
@@ -24,10 +54,6 @@ export async function PATCH(
       )
     }
 
-    const body = await req.json()
-    const { status, assignedTo, updateMessage, author = "Admin", action } = body
-
-    // 1. Action: Mark Resolved
     if (action === "resolve" || status === "resolved") {
       doc.status = "resolved"
       doc.updates.push({
@@ -36,9 +62,7 @@ export async function PATCH(
         timestamp: "Just now",
         type: "resolved",
       })
-    }
-    // 2. Action: Acknowledge & Dispatch
-    else if (action === "acknowledge_dispatch") {
+    } else if (action === "acknowledge_dispatch") {
       const defaultAssignee =
         doc.assignedTo ||
         mockStaff.find(
@@ -54,10 +78,7 @@ export async function PATCH(
         timestamp: "Just now",
         type: "in_progress",
       })
-    }
-    // 3. Status update
-    else if (status) {
-      // Dynamic SLA policy check
+    } else if (status) {
       const elapsedHours = Math.floor(
         (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
       )
@@ -77,7 +98,6 @@ export async function PATCH(
       })
     }
 
-    // 4. Assignee update
     if (assignedTo !== undefined) {
       doc.assignedTo = assignedTo
       doc.updates.push({
@@ -90,7 +110,6 @@ export async function PATCH(
       })
     }
 
-    // 5. Append message / note
     if (updateMessage?.trim()) {
       doc.updates.push({
         id: `u-${Date.now()}`,
@@ -102,35 +121,9 @@ export async function PATCH(
     }
 
     await doc.save()
-
-    const elapsedHours = Math.floor(
-      (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
-    )
-    const effectiveAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
-
-    const ticket = {
-      id: doc.ticketId,
-      title: doc.title,
-      description: doc.description,
-      category: doc.category,
-      department: doc.department,
-      location: doc.location,
-      priority: doc.priority,
-      contactPhone: doc.contactPhone,
-      status: doc.status,
-      raisedBy: doc.raisedBy,
-      assignedTo: doc.assignedTo || null,
-      openedAt: doc.openedAt,
-      expectedReply: doc.expectedReply,
-      age: `${effectiveAgeHours}h`,
-      ageHours: effectiveAgeHours,
-      icon: doc.icon,
-      updates: doc.updates,
-    }
-
-    return NextResponse.json({ success: true, ticket })
+    return NextResponse.json({ success: true, ticket: formatDoc(doc) })
   } catch (err: any) {
-    console.error("Error updating ticket in MongoDB:", err)
+    console.error("Error updating ticket in database:", err)
     return NextResponse.json(
       { success: false, error: err.message },
       { status: 500 },

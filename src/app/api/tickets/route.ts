@@ -3,13 +3,45 @@ import { connectDB } from "@/lib/mongoose"
 import TicketModel from "@/models/Ticket"
 import { seedTickets } from "@/lib/seedTickets"
 
+function formatDoc(doc: any) {
+  const elapsedHours = Math.floor(
+    (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
+  )
+  const effectiveAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
+  const effectiveAge = `${effectiveAgeHours}h`
+
+  const effectiveStatus =
+    doc.status !== "resolved" && effectiveAgeHours > 48
+      ? "escalated"
+      : doc.status
+
+  return {
+    id: doc.ticketId,
+    title: doc.title,
+    description: doc.description,
+    category: doc.category,
+    department: doc.department,
+    location: doc.location,
+    priority: doc.priority || "medium",
+    contactPhone: doc.contactPhone,
+    status: effectiveStatus,
+    raisedBy: doc.raisedBy,
+    assignedTo: doc.assignedTo || null,
+    openedAt: doc.openedAt,
+    expectedReply: doc.expectedReply,
+    age: effectiveAge,
+    ageHours: effectiveAgeHours,
+    icon: doc.icon || "ticket",
+    updates: doc.updates || [],
+  }
+}
+
 export async function GET() {
   try {
     await connectDB()
 
     const count = await TicketModel.countDocuments()
     if (count === 0) {
-      // Seed initial tickets into MongoDB Atlas
       const seedDocs = seedTickets.map((t) => ({
         ticketId: t.ticketId,
         title: t.title,
@@ -30,49 +62,14 @@ export async function GET() {
         updates: t.updates,
         createdAt: new Date(Date.now() - (t.ageOffsetHours || 0) * 3600 * 1000),
       }))
-
       await TicketModel.insertMany(seedDocs)
     }
 
     const docs = await TicketModel.find({}).sort({ createdAt: -1 }).lean()
-
-    const tickets = docs.map((doc: any) => {
-      const elapsedHours = Math.floor(
-        (Date.now() - new Date(doc.createdAt).getTime()) / (1000 * 60 * 60),
-      )
-      const effectiveAgeHours = Math.max(doc.ageHours || 0, elapsedHours)
-      const effectiveAge = `${effectiveAgeHours}h`
-
-      // SLA policy: unresolved ticket over 48h turns/remains escalated
-      const effectiveStatus =
-        doc.status !== "resolved" && effectiveAgeHours > 48
-          ? "escalated"
-          : doc.status
-
-      return {
-        id: doc.ticketId,
-        title: doc.title,
-        description: doc.description,
-        category: doc.category,
-        department: doc.department,
-        location: doc.location,
-        priority: doc.priority || "medium",
-        contactPhone: doc.contactPhone,
-        status: effectiveStatus,
-        raisedBy: doc.raisedBy,
-        assignedTo: doc.assignedTo || null,
-        openedAt: doc.openedAt,
-        expectedReply: doc.expectedReply,
-        age: effectiveAge,
-        ageHours: effectiveAgeHours,
-        icon: doc.icon || "ticket",
-        updates: doc.updates || [],
-      }
-    })
-
+    const tickets = docs.map(formatDoc)
     return NextResponse.json({ success: true, tickets })
   } catch (err: any) {
-    console.error("Error fetching tickets from MongoDB:", err)
+    console.error("Error fetching tickets from database:", err)
     return NextResponse.json(
       { success: false, error: err.message, tickets: [] },
       { status: 500 },
@@ -84,7 +81,6 @@ export async function POST(req: Request) {
   try {
     await connectDB()
     const body = await req.json()
-
     const {
       ticketId: requestedTicketId,
       title,
@@ -108,13 +104,10 @@ export async function POST(req: Request) {
       )
     }
 
-    // Determine sequential ticket ID if not specified or avoid collision
     let ticketId = requestedTicketId
     if (ticketId) {
       const existing = await TicketModel.findOne({ ticketId })
-      if (existing) {
-        ticketId = undefined
-      }
+      if (existing) ticketId = undefined
     }
 
     if (!ticketId) {
@@ -134,20 +127,21 @@ export async function POST(req: Request) {
 
     const catLower = category.toLowerCase()
     let icon = "ticket"
-    if (catLower.includes("wi-fi") || catLower.includes("network"))
+    if (catLower.includes("wi-fi") || catLower.includes("network")) {
       icon = "wifi"
-    else if (
+    } else if (
       catLower.includes("classroom") ||
       catLower.includes("projector") ||
       catLower.includes("lab")
-    )
+    ) {
       icon = "monitor"
-    else if (
+    } else if (
       catLower.includes("water") ||
       catLower.includes("cooler") ||
       catLower.includes("plumbing")
-    )
+    ) {
       icon = "droplet"
+    }
 
     const expectedReply =
       priority === "high" || priority === "critical"
@@ -187,29 +181,10 @@ export async function POST(req: Request) {
       updates: [initialUpdate],
     })
 
-    const ticket = {
-      id: newDoc.ticketId,
-      title: newDoc.title,
-      description: newDoc.description,
-      category: newDoc.category,
-      department: newDoc.department,
-      location: newDoc.location,
-      priority: newDoc.priority,
-      contactPhone: newDoc.contactPhone,
-      status: newDoc.status,
-      raisedBy: newDoc.raisedBy,
-      assignedTo: null,
-      openedAt: newDoc.openedAt,
-      expectedReply: newDoc.expectedReply,
-      age: "0h",
-      ageHours: 0,
-      icon: newDoc.icon,
-      updates: newDoc.updates,
-    }
-
+    const ticket = formatDoc(newDoc)
     return NextResponse.json({ success: true, ticket }, { status: 201 })
   } catch (err: any) {
-    console.error("Error creating ticket in MongoDB:", err)
+    console.error("Error creating ticket in database:", err)
     return NextResponse.json(
       { success: false, error: err.message },
       { status: 500 },
