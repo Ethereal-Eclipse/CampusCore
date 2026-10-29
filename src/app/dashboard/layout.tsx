@@ -1,9 +1,5 @@
 import Link from "next/link"
-import {
-  Grid,
-  Search,
-  Bell,
-} from "@/components/ui/Icons"
+import { Grid, Search, Bell } from "@/components/ui/Icons"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { SidebarNav } from "@/components/layout/SidebarNav"
 import { NotificationBell } from "@/components/layout/NotificationBell"
@@ -65,32 +61,32 @@ export default async function DashboardLayout({
               href="/dashboard/profile"
               className="hidden md:flex gap-[10px] items-center pl-[16px] border-l border-[var(--color-line)] hover:opacity-85 transition-opacity cursor-pointer"
             >
-            {session.user?.image ? (
-              <img
-                src={session.user.image}
-                alt={session.user.name || "User"}
-                className="w-[38px] h-[38px] rounded-full object-cover border border-[var(--color-line)]"
-              />
-            ) : (
-              <div className="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-[var(--color-navy)] to-[#a855f7] text-white grid place-items-center font-bold">
-                {session.user?.name?.charAt(0) || "U"}
+              {session.user?.image ? (
+                <img
+                  src={session.user.image}
+                  alt={session.user.name || "User"}
+                  className="w-[38px] h-[38px] rounded-full object-cover border border-[var(--color-line)]"
+                />
+              ) : (
+                <div className="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-[var(--color-navy)] to-[#a855f7] text-white grid place-items-center font-bold">
+                  {session.user?.name?.charAt(0) || "U"}
+                </div>
+              )}
+              <div>
+                <b className="text-[14px] leading-[1.3] block text-[var(--color-ink)]">
+                  {session.user?.name}
+                </b>
+                <small className="text-[var(--color-mut)] block text-[12px] leading-[1.3]">
+                  {session.user?.role === "admin" ? "Administrator" : "Student"}
+                </small>
               </div>
-            )}
-            <div>
-              <b className="text-[14px] leading-[1.3] block text-[var(--color-ink)]">
-                {session.user?.name}
-              </b>
-              <small className="text-[var(--color-mut)] block text-[12px] leading-[1.3]">
-                {session.user?.role === "admin" ? "Administrator" : "Student"}
-              </small>
-            </div>
-          </Link>
-        </header>
-        <div className="max-w-[1180px] mx-auto p-[20px_16px] md:p-[32px_32px_48px] grid gap-[26px]">
-          {children}
-        </div>
-      </main>
-    </div>
+            </Link>
+          </header>
+          <div className="max-w-[1180px] mx-auto p-[20px_16px] md:p-[32px_32px_48px] grid gap-[26px]">
+            {children}
+          </div>
+        </main>
+      </div>
     </NotificationProvider>
   )
 }

@@ -26,7 +26,9 @@ export function ProgressBar4({
   }
 
   return (
-    <div className={`flex items-center gap-[6px] w-full max-w-[260px] ${className}`}>
+    <div
+      className={`flex items-center gap-[6px] w-full max-w-[260px] ${className}`}
+    >
       {[1, 2, 3, 4].map((segmentIndex) => {
         const isFilled = segmentIndex <= activeSegments
         return (

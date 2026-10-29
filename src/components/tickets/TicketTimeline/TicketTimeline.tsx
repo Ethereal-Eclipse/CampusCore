@@ -6,7 +6,10 @@ interface TicketTimelineProps {
   className?: string
 }
 
-export function TicketTimeline({ ticket, className = "" }: TicketTimelineProps) {
+export function TicketTimeline({
+  ticket,
+  className = "",
+}: TicketTimelineProps) {
   // Determine current active step (1: Submitted, 2: Assigned, 3: In progress, 4: Resolved)
   let activeStep = 1
   if (ticket.status === "resolved") {
@@ -23,7 +26,8 @@ export function TicketTimeline({ ticket, className = "" }: TicketTimelineProps) 
   const submittedUpdate = ticket.updates.find((u) => u.type === "submitted")
   const assignedUpdate = ticket.updates.find((u) => u.type === "assigned")
   const inProgressUpdates = ticket.updates.filter(
-    (u) => u.type === "in_progress" || u.type === "note" || u.type === "escalated"
+    (u) =>
+      u.type === "in_progress" || u.type === "note" || u.type === "escalated",
   )
   const resolvedUpdate = ticket.updates.find((u) => u.type === "resolved")
 
@@ -41,20 +45,26 @@ export function TicketTimeline({ ticket, className = "" }: TicketTimelineProps) 
       title: ticket.assignedTo
         ? `Assigned to ${ticket.assignedTo.name}`
         : "Assigned",
-      time: assignedUpdate?.timestamp || (ticket.assignedTo ? "Assigned" : null),
+      time:
+        assignedUpdate?.timestamp || (ticket.assignedTo ? "Assigned" : null),
       message: null,
     },
     {
       index: 3,
       title: ticket.status === "escalated" ? "Escalated" : "In progress",
-      time: latestInProgress?.timestamp || (ticket.status === "in_progress" ? "Recent" : null),
+      time:
+        latestInProgress?.timestamp ||
+        (ticket.status === "in_progress" ? "Recent" : null),
       message: latestInProgress?.message || null,
     },
     {
       index: 4,
       title: "Resolved",
       time: resolvedUpdate?.timestamp || null,
-      message: resolvedUpdate?.message !== "Marked as resolved" ? resolvedUpdate?.message : null,
+      message:
+        resolvedUpdate?.message !== "Marked as resolved"
+          ? resolvedUpdate?.message
+          : null,
     },
   ]
 
@@ -66,8 +76,10 @@ export function TicketTimeline({ ticket, className = "" }: TicketTimelineProps) 
 
       <div className="flex flex-col">
         {steps.map((step, idx) => {
-          const isDone = activeStep > step.index || (activeStep === 4 && step.index === 4)
-          const isCurrent = activeStep === step.index && !(activeStep === 4 && step.index === 4)
+          const isDone =
+            activeStep > step.index || (activeStep === 4 && step.index === 4)
+          const isCurrent =
+            activeStep === step.index && !(activeStep === 4 && step.index === 4)
           const isFuture = activeStep < step.index
           const isLast = idx === steps.length - 1
 

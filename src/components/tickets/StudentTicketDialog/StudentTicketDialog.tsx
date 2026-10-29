@@ -20,7 +20,8 @@ export function StudentTicketDialog() {
       }
     }
     window.addEventListener("keydown", handleKeyDown, { capture: true })
-    return () => window.removeEventListener("keydown", handleKeyDown, { capture: true })
+    return () =>
+      window.removeEventListener("keydown", handleKeyDown, { capture: true })
   }, [selectTicket])
 
   if (!selectedTicket) return null

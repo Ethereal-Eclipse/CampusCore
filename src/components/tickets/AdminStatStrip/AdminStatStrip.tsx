@@ -5,13 +5,16 @@ interface AdminStatStripProps {
   className?: string
 }
 
-export function AdminStatStrip({ tickets, className = "" }: AdminStatStripProps) {
+export function AdminStatStrip({
+  tickets,
+  className = "",
+}: AdminStatStripProps) {
   const openCount = tickets.filter((t) => t.status !== "resolved").length
   const overdueCount = tickets.filter(
-    (t) => t.ageHours > 48 && t.status !== "resolved"
+    (t) => t.ageHours > 48 && t.status !== "resolved",
   ).length
   const unassignedCount = tickets.filter(
-    (t) => !t.assignedTo && t.status !== "resolved"
+    (t) => !t.assignedTo && t.status !== "resolved",
   ).length
 
   const stats = [
@@ -34,7 +37,10 @@ export function AdminStatStrip({ tickets, className = "" }: AdminStatStripProps)
   ]
 
   return (
-    <section aria-label="Ticket statistics summary" className={`grid grid-cols-2 md:grid-cols-4 gap-[14px] ${className}`}>
+    <section
+      aria-label="Ticket statistics summary"
+      className={`grid grid-cols-2 md:grid-cols-4 gap-[14px] ${className}`}
+    >
       {stats.map((stat) => (
         <article
           key={stat.label}

@@ -48,7 +48,10 @@ export default async function ProfilePage() {
         </div>
       </header>
 
-      <section aria-label="Profile metrics and activity" className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+      <section
+        aria-label="Profile metrics and activity"
+        className="grid grid-cols-1 md:grid-cols-2 gap-[20px]"
+      >
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[18px] p-[22px] shadow-[var(--shadow-sh)]">
           <h3 className="font-bold text-[18px] mb-[16px] text-[var(--color-navy)]">
             Academic Stats

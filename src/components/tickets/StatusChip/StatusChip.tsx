@@ -1,5 +1,11 @@
 import { TicketStatus, statusConfig } from "../types"
-import { Wifi, Monitor, Droplet, AlertTriangle, Ticket } from "@/components/ui/Icons"
+import {
+  Wifi,
+  Monitor,
+  Droplet,
+  AlertTriangle,
+  Ticket,
+} from "@/components/ui/Icons"
 
 interface StatusChipProps {
   status: TicketStatus

@@ -11,7 +11,8 @@ export default async function SettingsPage() {
           Settings
         </h2>
         <p className="text-[var(--color-mut)] text-[14px]">
-          Manage your account preferences, authorization roles, and app settings.
+          Manage your account preferences, authorization roles, and app
+          settings.
         </p>
       </div>
 

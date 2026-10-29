@@ -16,7 +16,10 @@ interface NotificationItemProps {
   onClick?: () => void
 }
 
-export function NotificationItem({ notification, onClick }: NotificationItemProps) {
+export function NotificationItem({
+  notification,
+  onClick,
+}: NotificationItemProps) {
   return (
     <article
       onClick={onClick}

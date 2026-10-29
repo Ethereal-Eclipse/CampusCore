@@ -22,7 +22,9 @@ export function NotificationBell() {
           : "Notifications"
       }
     >
-      <Bell className={`w-[18px] h-[18px] transition-transform ${isPinging ? "scale-110 text-blue-500" : ""}`} />
+      <Bell
+        className={`w-[18px] h-[18px] transition-transform ${isPinging ? "scale-110 text-blue-500" : ""}`}
+      />
 
       {/* Ping radar animation when new ticket arrives */}
       {isPinging && (

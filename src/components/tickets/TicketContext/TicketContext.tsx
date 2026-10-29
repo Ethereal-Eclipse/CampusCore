@@ -224,7 +224,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             )
           }
         })
-        .catch((err) => console.error("Error saving assignee to database:", err))
+        .catch((err) =>
+          console.error("Error saving assignee to database:", err),
+        )
     },
     [],
   )
@@ -310,7 +312,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           )
         }
       })
-      .catch((err) => console.error("Error saving resolution to database:", err))
+      .catch((err) =>
+        console.error("Error saving resolution to database:", err),
+      )
   }, [])
 
   const acknowledgeAndDispatch = useCallback((id: string) => {
@@ -471,7 +475,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
             )
           }
         })
-        .catch((err) => console.error("Error creating ticket in database:", err))
+        .catch((err) =>
+          console.error("Error creating ticket in database:", err),
+        )
 
       return newTicket
     },

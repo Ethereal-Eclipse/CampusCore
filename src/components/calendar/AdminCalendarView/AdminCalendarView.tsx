@@ -93,7 +93,8 @@ export function AdminCalendarView() {
             </h1>
           </div>
           <p className="text-[14px] text-[var(--color-mut)]">
-            Schedule university events, publish exam timelines, and coordinate lab and auditorium reservations.
+            Schedule university events, publish exam timelines, and coordinate
+            lab and auditorium reservations.
           </p>
         </div>
 
@@ -110,18 +111,25 @@ export function AdminCalendarView() {
       )}
 
       {/* Metric Strip */}
-      <section aria-label="Calendar metrics" className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
+      <section
+        aria-label="Calendar metrics"
+        className="grid grid-cols-2 md:grid-cols-4 gap-[14px]"
+      >
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Published Events
           </span>
-          <span className="text-[26px] font-bold text-[var(--color-ink)]">{events.length}</span>
+          <span className="text-[26px] font-bold text-[var(--color-ink)]">
+            {events.length}
+          </span>
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
             Exam Schedules
           </span>
-          <span className="text-[26px] font-bold text-purple-400">2 Active</span>
+          <span className="text-[26px] font-bold text-purple-400">
+            2 Active
+          </span>
         </article>
         <article className="bg-[var(--color-card-ref)] border border-[var(--color-line)] rounded-[14px] p-[16px_18px]">
           <span className="text-[12px] text-[var(--color-mut)] font-medium block mb-[4px]">
@@ -206,12 +214,18 @@ export function AdminCalendarView() {
                   onChange={(e) => setLocation(e.target.value)}
                   className="w-full px-[12px] py-[9px] rounded-[10px] bg-[var(--color-bg)] border border-[var(--color-line)] text-[13px] text-[var(--color-ink)] outline-none cursor-pointer"
                 >
-                  <option value="Main Auditorium (Audi 1)">Main Auditorium (Audi 1)</option>
+                  <option value="Main Auditorium (Audi 1)">
+                    Main Auditorium (Audi 1)
+                  </option>
                   <option value="Auditorium 2">Auditorium 2</option>
                   <option value="Computer Lab 2">Computer Lab 2</option>
                   <option value="Computer Lab 3">Computer Lab 3</option>
-                  <option value="Seminar Hall Block B">Seminar Hall Block B</option>
-                  <option value="CampusCore Digital Portal">CampusCore Digital Portal</option>
+                  <option value="Seminar Hall Block B">
+                    Seminar Hall Block B
+                  </option>
+                  <option value="CampusCore Digital Portal">
+                    CampusCore Digital Portal
+                  </option>
                 </select>
               </div>
 

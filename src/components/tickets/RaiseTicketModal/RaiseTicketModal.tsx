@@ -76,7 +76,8 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
       }
     }
     window.addEventListener("keydown", handleKeyDown, { capture: true })
-    return () => window.removeEventListener("keydown", handleKeyDown, { capture: true })
+    return () =>
+      window.removeEventListener("keydown", handleKeyDown, { capture: true })
   }, [isOpen])
 
   if (!isOpen) return null
@@ -139,7 +140,8 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
               Raise Campus Grievance
             </h3>
             <p className="text-[13px] text-[var(--color-mut)] mt-[2px]">
-              Provide issue details so department management can triage and dispatch staff.
+              Provide issue details so department management can triage and
+              dispatch staff.
             </p>
           </div>
           <button
@@ -183,7 +185,11 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
             </div>
           </div>
 
-          <form id="raise-ticket-form" onSubmit={handleSubmit} className="flex flex-col gap-[14px]">
+          <form
+            id="raise-ticket-form"
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-[14px]"
+          >
             {/* Issue Title */}
             <div>
               <label className="block text-[12px] font-semibold text-[var(--color-mut)] mb-[4px]">
@@ -286,7 +292,9 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
                   }`}
                 >
                   Low (Minor)
-                  <span className="block text-[10px] opacity-75 mt-[1px]">48h SLA</span>
+                  <span className="block text-[10px] opacity-75 mt-[1px]">
+                    48h SLA
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -298,7 +306,9 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
                   }`}
                 >
                   Medium (Routine)
-                  <span className="block text-[10px] opacity-75 mt-[1px]">24h SLA</span>
+                  <span className="block text-[10px] opacity-75 mt-[1px]">
+                    24h SLA
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -310,7 +320,9 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
                   }`}
                 >
                   High (Disruptive)
-                  <span className="block text-[10px] opacity-75 mt-[1px]">6h SLA</span>
+                  <span className="block text-[10px] opacity-75 mt-[1px]">
+                    6h SLA
+                  </span>
                 </button>
               </div>
             </div>
@@ -334,7 +346,8 @@ export function RaiseTicketModal({ isOpen, onClose }: RaiseTicketModalProps) {
             <div className="flex items-start gap-[10px] p-[10px_14px] rounded-[10px] bg-[var(--color-bg)] border border-[var(--color-line)] text-[12px] text-[var(--color-mut)]">
               <Clock className="w-[15px] h-[15px] text-blue-400 shrink-0 mt-[1px]" />
               <span>
-                CampusCore auto-escalates unresolved grievances past 48 hours directly to the Senior Campus Administration.
+                CampusCore auto-escalates unresolved grievances past 48 hours
+                directly to the Senior Campus Administration.
               </span>
             </div>
           </form>

@@ -101,8 +101,8 @@ export function AdminRolesSection() {
           </h3>
         </div>
         <p className="text-[13px] text-[var(--color-mut)] mt-[4px]">
-          Manage whitelisted staff emails with administrative triage and dispatch
-          permissions.
+          Manage whitelisted staff emails with administrative triage and
+          dispatch permissions.
         </p>
       </div>
 

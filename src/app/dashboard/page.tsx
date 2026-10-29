@@ -142,7 +142,10 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <section aria-label="Key campus statistics" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+      <section
+        aria-label="Key campus statistics"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]"
+      >
         {stats.map((st) => (
           <Link key={st.label} href={st.href} className="block group">
             <StatCard
