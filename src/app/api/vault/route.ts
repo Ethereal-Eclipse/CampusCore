@@ -54,6 +54,8 @@ export async function POST(req: Request) {
     let type = "PDF"
     let size = "2.1 MB"
     let fileUrl = "https://pub-campuscore.r2.dev/vault/sample_document.pdf"
+    let fileData: string | undefined = undefined
+    let fileName: string | undefined = undefined
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData()
@@ -69,6 +71,8 @@ export async function POST(req: Request) {
         const buffer = Buffer.from(bytes)
         const sizeMb = (file.size / (1024 * 1024)).toFixed(1)
         size = `${sizeMb} MB`
+        fileData = buffer.toString("base64")
+        fileName = file.name
         fileUrl = await uploadDocumentToR2(buffer, file.name, file.type)
       }
     } else {
@@ -97,10 +101,17 @@ export async function POST(req: Request) {
       type,
       size,
       fileUrl,
+      fileData,
+      fileName,
       downloadCount: 0,
       flagged: false,
       flaggedCount: 0,
     })
+
+    if (!fileUrl.startsWith("http")) {
+      newItem.fileUrl = `/api/vault/${newItem._id}/download`
+      await newItem.save()
+    }
 
     return NextResponse.json({ success: true, item: newItem }, { status: 201 })
   } catch (err: any) {

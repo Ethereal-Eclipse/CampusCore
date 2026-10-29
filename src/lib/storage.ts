@@ -128,20 +128,7 @@ export async function uploadImageToCloudinary(
     }
   }
 
-  // Local storage fallback for seamless showcase
-  try {
-    const uploadDir = path.join(process.cwd(), "public", "uploads", folder)
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true })
-    }
-    const localFileName = `${Date.now()}_${sanitized}`
-    const localFilePath = path.join(uploadDir, localFileName)
-    fs.writeFileSync(localFilePath, buffer)
-    return `/uploads/${folder}/${localFileName}`
-  } catch (err) {
-    console.error("Local image save error:", err)
-    return folder === "marketplace"
-      ? "/images/sample-product.jpg"
-      : "/images/sample-lost-item.jpg"
-  }
+  // Fallback: return data URL to guarantee zero broken images on Vercel/localhost
+  const mimeType = fileName.endsWith(".png") ? "image/png" : "image/jpeg"
+  return `data:${mimeType};base64,${buffer.toString("base64")}`
 }

@@ -8,6 +8,8 @@ export interface IVaultItem extends Document {
   branch: string
   semester: string
   fileUrl: string
+  fileData?: string
+  fileName?: string
   downloadCount: number
   uploadedBy?: {
     name: string
@@ -29,6 +31,8 @@ const VaultItemSchema: Schema = new Schema(
     branch: { type: String, required: true, index: true },
     semester: { type: String, required: true, index: true },
     fileUrl: { type: String, default: "/uploads/vault/sample.pdf" },
+    fileData: { type: String },
+    fileName: { type: String },
     downloadCount: { type: Number, default: 0 },
     uploadedBy: {
       name: { type: String },

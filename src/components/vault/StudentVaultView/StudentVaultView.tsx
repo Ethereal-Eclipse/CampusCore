@@ -60,17 +60,16 @@ export function StudentVaultView() {
   }, [selectedBranch, selectedSemester, search])
 
   const handleDownload = (res: any) => {
-    if (res._id) {
-      fetch(`/api/vault/${res._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "download" }),
-      }).catch(() => {})
+    const docId = res._id || res.id
+    if (docId) {
+      window.open(`/api/vault/${docId}/download`, "_blank")
+    } else {
+      window.open(
+        res.fileUrl ||
+          "https://pub-campuscore.r2.dev/vault/sample_document.pdf",
+        "_blank",
+      )
     }
-    window.open(
-      res.fileUrl || "https://pub-campuscore.r2.dev/vault/sample_document.pdf",
-      "_blank",
-    )
   }
 
   const handleUploadSubmit = async (e: React.FormEvent) => {
